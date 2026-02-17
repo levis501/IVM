@@ -91,10 +91,18 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <Link href="/auth/forgot-email" className="text-sm text-[#2d5016] hover:underline">
-            Forgot your email?
-          </Link>
+        <div className="mt-6 text-center space-y-2">
+          <div>
+            <Link href="/auth/forgot-email" className="text-sm text-[#2d5016] hover:underline">
+              Forgot your email?
+            </Link>
+          </div>
+          <div>
+            <span className="text-sm text-gray-600">New here? </span>
+            <Link href="/register" className="text-sm text-[#2d5016] hover:underline font-medium">
+              Create an account
+            </Link>
+          </div>
         </div>
 
         <div className="mt-4 text-center">

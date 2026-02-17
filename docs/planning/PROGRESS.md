@@ -180,13 +180,59 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Phase 2: User Management (M5-M8.5)
 
 ### M05: User Registration Flow
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
+**Goal**: New users can register with required information and receive confirmation of pending verification status.
+
 **Key Deliverables**:
-- [ ] Registration form (firstName, lastName, email, phone, unit)
-- [ ] Email verification
-- [ ] Pending user state
+- [x] Registration form with validation (firstName, lastName, email, phone, unit, resident/owner checkboxes)
+- [x] Zod schema for registration data validation
+- [x] Required fields validation enforced
+- [x] Unit number validation (alphanumeric, max 6 characters)
+- [x] At least one role (resident/owner) required
+- [x] Create user with verificationStatus = "pending"
+- [x] Registration confirmation page with clear messaging
+- [x] Form validation and error handling
+- [x] Duplicate email detection
+- [x] Register link added to site menu for unauthenticated users
+- [x] Register link added to login page
+
+**New Files Created**:
+- `lib/validation.ts` - Zod validation schema for registration
+- `app/register/page.tsx` - Registration form
+- `app/register/confirmation/page.tsx` - Registration confirmation page
+- `app/api/auth/register/route.ts` - Registration API endpoint
+
+**Files Modified**:
+- `components/site_menu.tsx` - Added Register link for unauthenticated users
+- `app/auth/login/page.tsx` - Added "Create an account" link
+
+**Technical Notes**:
+- Uses role-based system (resident/owner roles) instead of boolean fields (isResident/isOwner)
+- Unit numbers are normalized to uppercase during registration
+- Roles are assigned via many-to-many relationship with Role table
+- Zod safeParse used for validation with detailed error messages
+- All validation errors properly displayed to users
+
+**Manual Test Results**:
+- ✅ Registration form accessible at /register
+- ✅ All required fields validated (firstName, lastName, email, phone, unit)
+- ✅ At least one of resident/owner checkbox required
+- ✅ Unit number validation works (alphanumeric, max 6 chars)
+- ✅ Duplicate email detection works
+- ✅ Users created with pending verification status
+- ✅ Roles (resident, owner, or both) properly assigned
+- ✅ Confirmation page displays appropriate message
+- ✅ Pending users cannot log in (enforced by M03)
+
+**Issues Resolved**:
+- Fixed Zod validation error handling by using safeParse instead of parse
+- Corrected Zod error property (issues instead of errors)
+- Added zod package to dependencies
+
+**Details**: See [M05-user-registration.md](./M05-user-registration.md)
 
 ---
 
@@ -379,22 +425,22 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 5 (M00, M01, M02, M03, M04)
+**Completed**: 6 (M00, M01, M02, M03, M04, M05)
 **In Progress**: 0
-**Not Started**: 16
-**Overall Progress**: 24%
+**Not Started**: 15
+**Overall Progress**: 29%
 
 ---
 
 ## Current Phase
-**Phase 1: Foundation** - Completed! Basic infrastructure and authentication in place.
+**Phase 2: User Management** - In progress. Basic registration flow complete.
 
 ## Next Steps
-1. Begin Phase 2: User Management
-2. Start M05: User Registration Flow
-   - Create registration form (firstName, lastName, email, phone, unit)
-   - Implement email verification
-   - Set user to pending state after registration
+1. Continue Phase 2: User Management
+2. Start M06: Verifier Notification System
+   - Create email notification system for verifiers
+   - Notify verifiers when new users register
+   - Include user details in notification
 
 ---
 

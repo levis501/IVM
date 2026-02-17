@@ -262,17 +262,30 @@ const SiteMenu = () => {
                   </li>
                 </>
               ) : (
-                <li style={{ padding: 0 }}>
-                  <Link
-                    href="/auth/login"
-                    onClick={closeMenu}
-                    style={getMenuItemStyle('login')}
-                    onMouseEnter={() => setHoveredItem('login')}
-                    onMouseLeave={() => setHoveredItem(null)}
-                  >
-                    Login
-                  </Link>
-                </li>
+                <>
+                  <li style={{ padding: 0 }}>
+                    <Link
+                      href="/auth/login"
+                      onClick={closeMenu}
+                      style={getMenuItemStyle('login')}
+                      onMouseEnter={() => setHoveredItem('login')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      Login
+                    </Link>
+                  </li>
+                  <li style={{ padding: 0 }}>
+                    <Link
+                      href="/register"
+                      onClick={closeMenu}
+                      style={getMenuItemStyle('register')}
+                      onMouseEnter={() => setHoveredItem('register')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      Register
+                    </Link>
+                  </li>
+                </>
               )}
             </ul>
           </div>

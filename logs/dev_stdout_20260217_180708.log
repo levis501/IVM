@@ -1,0 +1,59 @@
+
+> indian-village-manor@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.12
+   - Local:        http://localhost:3000
+   - Network:      http://10.0.0.173:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1044ms
+ ✓ Compiled /middleware in 143ms (114 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 1767ms (751 modules)
+ GET / 200 in 2080ms
+ ✓ Compiled in 129ms (308 modules)
+ ✓ Compiled /api/auth/[...nextauth] in 398ms (1013 modules)
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+ GET /api/auth/session 200 in 912ms
+ ✓ Compiled /auth/login in 180ms (1020 modules)
+ GET /auth/login 200 in 275ms
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+ GET /api/auth/providers 200 in 84ms
+ GET /api/auth/csrf 200 in 8ms
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+✅ Email sent successfully: {
+  to: 'indianvillagemanor+bootstrap@gmail.com',
+  subject: 'Sign in to Indian Village Manor',
+  messageId: '<3b6de1fa-c57b-e482-1a88-71b2ddfd29f6@indianvillagemanor.org>'
+}
+ POST /api/auth/signin/email 200 in 2367ms
+ GET /api/auth/session 200 in 28ms
+ ✓ Compiled /auth/verify-request in 162ms (1026 modules)
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+ GET /auth/verify-request 200 in 393ms
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+ GET /api/auth/session 200 in 66ms
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+ GET /api/auth/callback/email?callbackUrl=http%3A%2F%2Flocalhost%3A3000%2F&token=cabd4bb3fa8acfb1938c476cbd467a5b899e50d4ba4bb0511565e191b391a414&email=indianvillagemanor%2Bbootstrap%40gmail.com 302 in 44ms
+ GET / 200 in 59ms
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+ GET /api/auth/session 200 in 33ms
+ ✓ Compiled /api/committees/visible in 219ms (1040 modules)
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+ GET /api/committees/visible 200 in 353ms
+ GET /api/auth/csrf 200 in 29ms
+ POST /api/auth/signout 200 in 9ms
+ GET / 200 in 175ms
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+ GET /api/auth/session 200 in 25ms
+✅ Email configuration loaded successfully (using EMAIL_SERVER connection string)
+ ✓ Compiled /register in 230ms (1049 modules)
+ GET /register 200 in 338ms
+ ✓ Compiled /api/auth/register in 265ms (1128 modules)
+ POST /api/auth/register 201 in 375ms
+ ✓ Compiled /register/confirmation in 252ms (1130 modules)
+ GET /register/confirmation 200 in 324ms

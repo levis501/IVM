@@ -48,3 +48,13 @@
 2026-02-17T21:35:42.699Z | anonymous | indianvillagemanor+bootstrap@gmail.com | MAGIC_LINK_REQUEST | SUCCESS | unknown | 
 2026-02-17T21:35:52.578Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | LOGIN_ATTEMPT | SUCCESS | unknown | 
 2026-02-17T21:35:52.583Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | SESSION_CREATED | SUCCESS | unknown | 
+2026-02-17T22:13:36.544Z | 5c068310-fbdd-4601-a2ec-64ecbc60e189 | anonymous | user_registered | FAILED | ::1 | {"email":"testuser@example.com","unitNumber":"101A","roles":["resident"]}
+2026-02-17T22:20:11.652Z | e64a2e30-aa2e-48a6-8e43-ddefb85b8b43 | anonymous | user_registered | FAILED | ::1 | {"email":"owner@example.com","unitNumber":"201","roles":["owner"]}
+2026-02-17T22:20:11.675Z | cb8bf017-05ca-4789-b3f4-9b5fdaa95060 | anonymous | user_registered | FAILED | ::1 | {"email":"both@example.com","unitNumber":"301A","roles":["owner","resident"]}
+2026-02-17T23:03:50.866Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | LOGIN_ATTEMPT | SUCCESS | unknown | {"reason":"logout"}
+2026-02-17T23:07:21.929Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | LOGIN_ATTEMPT | SUCCESS | unknown | 
+2026-02-17T23:07:24.231Z | anonymous | indianvillagemanor+bootstrap@gmail.com | MAGIC_LINK_REQUEST | SUCCESS | unknown | 
+2026-02-17T23:07:30.730Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | LOGIN_ATTEMPT | SUCCESS | unknown | 
+2026-02-17T23:07:30.735Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | SESSION_CREATED | SUCCESS | unknown | 
+2026-02-17T23:07:34.317Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | LOGIN_ATTEMPT | SUCCESS | unknown | {"reason":"logout"}
+2026-02-17T23:08:06.543Z | d5b8e2ef-96de-4e2c-998f-400487755fc1 | anonymous | user_registered | FAILED | ::1 | {"email":"indianvillagemanor+johndoe@gmail.com","unitNumber":"NOSUCH","roles":["resident"]}
