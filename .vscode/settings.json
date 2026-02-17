@@ -5,6 +5,7 @@
     "npx prisma": true,
     "cp": true,
     "npx tsx": true,
-    "git add": true
+    "git add": true,
+    "git commit": true
   }
 }
