@@ -107,6 +107,25 @@ const SiteMenu = () => {
   const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [committees, setCommittees] = useState<Array<{ id: string; name: string; description: string }>>([]);
+
+  // Fetch committees when user is authenticated
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      fetch('/api/committees/visible')
+        .then(res => res.json())
+        .then(data => {
+          if (data.committees) {
+            setCommittees(data.committees);
+          }
+        })
+        .catch(error => {
+          console.error('Failed to fetch committees:', error);
+        });
+    } else {
+      setCommittees([]);
+    }
+  }, [status, session]);
 
   // Open menu automatically only on fresh login (not every page load)
   useEffect(() => {
@@ -122,22 +141,18 @@ const SiteMenu = () => {
   }, [status, session]);
 
   const toggleMenu = () => {
-    console.log('[Menu] Toggle menu, current state:', isOpen);
     setIsOpen(!isOpen);
   };
 
   const closeMenu = () => {
-    console.log('[Menu] Close menu called');
     setIsOpen(false);
   }
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    console.log('[Menu] Overlay clicked');
+  const handleOverlayClick = () => {
     toggleMenu();
   };
 
   const handleMenuContentClick = (e: React.MouseEvent) => {
-    console.log('[Menu] Menu content clicked - preventing close');
     e.stopPropagation();
   };
 
@@ -206,6 +221,27 @@ const SiteMenu = () => {
                   Contact
                 </Link>
               </li>
+
+              {/* Committee links for authenticated users */}
+              {session && committees.length > 0 && (
+                <>
+                  <li style={{ padding: 0 }}><hr style={menuDividerStyle} /></li>
+                  {committees.map((committee) => (
+                    <li key={committee.id} style={{ padding: 0 }}>
+                      <Link
+                        href={`/committees/${committee.id}`}
+                        onClick={closeMenu}
+                        style={getMenuItemStyle(`committee-${committee.id}`)}
+                        onMouseEnter={() => setHoveredItem(`committee-${committee.id}`)}
+                        onMouseLeave={() => setHoveredItem(null)}
+                      >
+                        {committee.name}
+                      </Link>
+                    </li>
+                  ))}
+                </>
+              )}
+
               <li style={{ padding: 0 }}><hr style={menuDividerStyle} /></li>
               {status === "loading" ? (
                 <li style={{ ...menuInfoStyle, padding: "14px 20px" }}>Loading...</li>

@@ -43,3 +43,8 @@
 2026-02-17T21:20:04.362Z | anonymous | indianvillagemanor+bootstrap@gmail.com | MAGIC_LINK_REQUEST | SUCCESS | unknown | 
 2026-02-17T21:20:15.417Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | LOGIN_ATTEMPT | SUCCESS | unknown | 
 2026-02-17T21:20:15.422Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | SESSION_CREATED | SUCCESS | unknown | 
+2026-02-17T21:33:14.658Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | LOGIN_ATTEMPT | SUCCESS | unknown | {"reason":"logout"}
+2026-02-17T21:35:41.537Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | LOGIN_ATTEMPT | SUCCESS | unknown | 
+2026-02-17T21:35:42.699Z | anonymous | indianvillagemanor+bootstrap@gmail.com | MAGIC_LINK_REQUEST | SUCCESS | unknown | 
+2026-02-17T21:35:52.578Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | LOGIN_ATTEMPT | SUCCESS | unknown | 
+2026-02-17T21:35:52.583Z | e6f0e332-23b4-40bb-a029-d119887fc2f1 | indianvillagemanor+bootstrap@gmail.com | SESSION_CREATED | SUCCESS | unknown | 

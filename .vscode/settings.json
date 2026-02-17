@@ -6,6 +6,7 @@
     "cp": true,
     "npx tsx": true,
     "git add": true,
-    "git commit": true
+    "git commit": true,
+    "pkill": true
   }
 }

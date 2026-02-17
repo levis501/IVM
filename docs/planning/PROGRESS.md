@@ -130,13 +130,50 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M04: Basic Menu and Navigation for Authenticated Users
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
+**Goal**: Authenticated users see appropriate menu items based on their roles and verification status.
+
 **Key Deliverables**:
-- [ ] Authenticated user menu
-- [ ] Logout functionality
-- [ ] Role-based menu items
+- [x] Dynamic menu items based on authentication status
+- [x] Logout functionality in hamburger menu
+- [x] User info displayed when signed in
+- [x] Committee links infrastructure (API endpoint for visible committees)
+- [x] Role-based committee visibility rules implemented
+- [x] Verified Calendar link is NOT present (will be added in M11)
+- [x] Improved menu UX (full-width clickable areas, hover states, click-outside-to-close)
+- [x] Session-based auto-open menu on fresh login
+
+**New Files Created**:
+- `app/api/committees/visible/route.ts` - API endpoint for fetching user's visible committees
+
+**Files Modified**:
+- `components/site_menu.tsx` - Added committee fetching and display logic, improved UX
+- `components/SessionProviderWrapper.tsx` - Added SessionTracker for fresh login detection
+
+**Committee Visibility Rules Implemented**:
+- Show committees with published documents (visible to all verified users)
+- Show committees where user is a member (visible even if no published docs)
+- Show committees where user has publisher role (visible even if no published docs)
+
+**Manual Test Results**:
+- ✅ Bootstrap user can log in and see Logout button
+- ✅ Calendar link is NOT present (will be added in M11)
+- ✅ Unauthenticated users see only Login link
+- ✅ Menu is responsive on mobile and desktop
+- ✅ Pending users cannot log in (tested in M03)
+- ✅ Click outside menu closes it
+- ✅ Menu auto-opens only on fresh login, not on every page load
+
+**Notes**:
+- No committees exist yet in seed data (will be created in M09)
+- Committee links section will appear empty until committees are created
+- Menu UX significantly improved with full-width hit areas and hover feedback
+- Semi-transparent overlay provides clear visual feedback
+
+**Details**: See [M04-menu-navigation.md](./M04-menu-navigation.md)
 
 ---
 
@@ -342,21 +379,22 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 4 (M00, M01, M02, M03)
+**Completed**: 5 (M00, M01, M02, M03, M04)
 **In Progress**: 0
-**Not Started**: 17
-**Overall Progress**: 19%
+**Not Started**: 16
+**Overall Progress**: 24%
 
 ---
 
 ## Current Phase
-**Phase 1: Foundation** - Setting up development environment and basic infrastructure
+**Phase 1: Foundation** - Completed! Basic infrastructure and authentication in place.
 
 ## Next Steps
-1. Begin M04: Basic Menu and Navigation for Authenticated Users
-   - Update menu to show authenticated user info
-   - Add role-based menu items
-   - Implement protected routes middleware
+1. Begin Phase 2: User Management
+2. Start M05: User Registration Flow
+   - Create registration form (firstName, lastName, email, phone, unit)
+   - Implement email verification
+   - Set user to pending state after registration
 
 ---
 
