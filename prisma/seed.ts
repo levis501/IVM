@@ -41,11 +41,14 @@ async function main() {
 
   const bootstrapUser = await prisma.user.upsert({
     where: { email: bootstrapEmail },
-    update: {},
+    update: {
+      emailVerified: new Date(), // Ensure emailVerified is set for existing bootstrap user
+    },
     create: {
       firstName: 'IVM Bootstrap',
       lastName: 'User',
       email: bootstrapEmail,
+      emailVerified: new Date(), // Bootstrap user's email is pre-verified
       phone: '000-000-0000',
       unitNumber: 'None',
       verificationStatus: 'verified',
