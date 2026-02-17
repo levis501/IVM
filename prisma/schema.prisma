@@ -17,8 +17,6 @@ model User {
   email                  String      @unique
   phone                  String
   unitNumber             String      // alphanumeric, max 6 characters
-  isResident             Boolean
-  isOwner                Boolean
   verificationStatus     String      // "pending", "verified", "denied"
   verificationUpdatedAt  DateTime?
   verificationUpdatedBy  String?     // User.id reference

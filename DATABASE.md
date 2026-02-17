@@ -18,8 +18,6 @@ model User {
   email                  String    @unique
   phone                  String
   unitNumber             String    // alphanumeric, max 6 characters
-  isResident             Boolean
-  isOwner                Boolean
   verificationStatus     String    // "pending", "verified", "denied"
   verificationUpdatedAt  DateTime?
   verificationUpdatedBy  String?   // User.id reference
@@ -38,22 +36,26 @@ model User {
 - `email`: Unique email address for authentication
 - `phone`: Phone number (required)
 - `unitNumber`: Unit number in the manor (alphanumeric, max 6 characters, manually verified)
-- `isResident`: Boolean flag indicating if user is a resident
-- `isOwner`: Boolean flag indicating if user is an owner
 - `verificationStatus`: Current verification state - "pending", "verified", or "denied"
 - `verificationUpdatedAt`: Timestamp of last verification status change
 - `verificationUpdatedBy`: User ID of verifier who updated the status
 - `verificationComment`: Optional comment from verifier
-- `roles`: Many-to-many relationship with Role model
+- `roles`: Many-to-many relationship with Role model (includes "owner" and "resident" roles)
 - `committees`: Many-to-many relationship with Committee model
 - `createdAt`: Timestamp of user registration
 - `updatedAt`: Timestamp of last profile update
 
 **Constraints**:
 - Email must be unique
-- User must have `isResident = true` OR `isOwner = true` (at least one, can be both)
+- User must have at least one role assigned from registration form ("owner" and/or "resident")
 - unitNumber must be alphanumeric and maximum 6 characters
 - verificationStatus must be one of: "pending", "verified", "denied"
+
+**Owner and Resident Roles**:
+- During registration, users select whether they are an owner, resident, or both
+- The application assumes these selections are correct but unverified
+- The "owner" and "resident" roles are assigned based on registration form selections
+- Verifiers review and can modify role assignments during the verification process
 
 **Indexes**:
 - Primary: `id`
@@ -80,7 +82,8 @@ model Role {
 - `calendar`: Can create, edit, and delete events
 - `verifier`: Can approve or deny user registrations
 - `user`: Base user role (typically assigned automatically)
-- `owner`: Owner role (based on isOwner flag)
+- `owner`: Owner role (assigned based on registration form selection, verified by verifier)
+- `resident`: Resident role (assigned based on registration form selection, verified by verifier)
 
 **Fields**:
 - `id`: UUID primary key

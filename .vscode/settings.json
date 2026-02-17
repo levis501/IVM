@@ -3,6 +3,8 @@
     "npx create-next-app@latest": true,
     "npm install": true,
     "npx prisma": true,
-    "cp": true
+    "cp": true,
+    "npx tsx": true,
+    "git add": true
   }
 }
