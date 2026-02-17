@@ -29,7 +29,7 @@ export default function Home() {
       <GridSection rows={24} id="interiors1">
         <GridPhoto gridCell={[1, 1, 24, 1]} src="/Interior3.jpg" alt="IVM Interior #3" />
         <GridText gridCell={[1, 2, 10, 2]}>
-          In the mid 1920s IVM advertisements used the phrase "Detroit's Most Exclusive Apartment Building".  A lot has happened since the building was converted into condos in 1998.  Many of the original common area elements remain. Each condo unit has taken on the identity of its owner.  Many walls have been literally removed and floor plans modified to efficiently utilize the spacious units. Some new kitchens and bathrooms have been installed. Other cosmetic changes have been made to address current needs, adding color, texture and features to make it feel like home.
+          In the mid 1920s IVM advertisements used the phrase &quot;Detroit&apos;s Most Exclusive Apartment Building&quot;.  A lot has happened since the building was converted into condos in 1998.  Many of the original common area elements remain. Each condo unit has taken on the identity of its owner.  Many walls have been literally removed and floor plans modified to efficiently utilize the spacious units. Some new kitchens and bathrooms have been installed. Other cosmetic changes have been made to address current needs, adding color, texture and features to make it feel like home.
         </GridText>
         <GridPhoto gridCell={[11, 2, 14, 2]} src="/Interior1.jpg" alt="IVM Interior #1" />
       </GridSection>

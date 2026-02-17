@@ -81,15 +81,51 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M03: Magic Link Authentication and Basic Audit Logging
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
+**Goal**: Implement email magic-link authentication flow with rate limiting and basic audit logging.
+
 **Key Deliverables**:
-- [ ] Magic link login flow
-- [ ] Email delivery system
-- [ ] Rate limiting
-- [ ] Basic audit logging
-- [ ] Pending user login blocked
+- [x] NextAuth configuration with email provider
+- [x] Magic-link email template (from EmailTemplate table)
+- [x] Login page with email input
+- [x] "Check your email" confirmation page
+- [x] Auth error page for pending/denied users
+- [x] Session management with secure HTTP-only cookies
+- [x] Logout functionality in header menu
+- [x] Email verification token generation and validation
+- [x] Rate limiting for login and magic-link requests
+- [x] Pending users blocked from logging in with appropriate message
+- [x] Email recovery flow (unit number lookup)
+- [x] Basic audit logging to /data/logs volume
+- [x] Failed login attempt tracking
+- [x] Session timeout configured via SystemConfig (90 days)
+
+**Database Changes**:
+- Added NextAuth tables: Account, Session, VerificationToken
+- Updated User model with accounts and sessions relations
+- Updated AuditLog model schema (entityType, entityId, details, ipAddress, userAgent)
+
+**New Files Created**:
+- `lib/auth.ts` - NextAuth configuration and callbacks
+- `lib/audit.ts` - Audit logging utility with file and database writes
+- `types/next-auth.d.ts` - TypeScript type declarations for NextAuth
+- `app/auth/login/page.tsx` - Login page with email input
+- `app/auth/verify-request/page.tsx` - Confirmation page after magic link sent
+- `app/auth/error/page.tsx` - Error page for auth failures
+- `app/auth/forgot-email/page.tsx` - Email recovery by unit number
+- `app/api/auth/recover-email/route.ts` - Email recovery API endpoint
+
+**Issues Resolved**:
+- Fixed Prisma import to use named exports `{ prisma }`
+- Fixed TypeScript linting errors (removed `any` types, unused parameters)
+- Fixed ESLint errors (replaced `<a>` with `<Link>`, escaped entities)
+- Wrapped useSearchParams in Suspense boundary for error page
+- Fixed Prisma JSON type casting for audit log details
+
+**Details**: See [M03-magic-link-auth-audit.md](./M03-magic-link-auth-audit.md)
 
 ---
 
@@ -306,10 +342,10 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 3 (M00, M01, M02)
+**Completed**: 4 (M00, M01, M02, M03)
 **In Progress**: 0
-**Not Started**: 18
-**Overall Progress**: 14%
+**Not Started**: 17
+**Overall Progress**: 19%
 
 ---
 
@@ -317,12 +353,10 @@ This document tracks the completion status of all milestones in the Indian Villa
 **Phase 1: Foundation** - Setting up development environment and basic infrastructure
 
 ## Next Steps
-1. Begin M03: Magic Link Authentication and Basic Audit Logging
-   - Implement magic link login flow
-   - Set up email delivery system with Nodemailer
-   - Add rate limiting for login attempts and magic link requests
-   - Implement basic audit logging for authentication events
-   - Block pending users from logging in
+1. Begin M04: Basic Menu and Navigation for Authenticated Users
+   - Update menu to show authenticated user info
+   - Add role-based menu items
+   - Implement protected routes middleware
 
 ---
 

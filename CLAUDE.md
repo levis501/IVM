@@ -7,7 +7,7 @@ This document helps AI agents quickly understand and navigate the Indian Village
 **Indian Village Manor Community Website** - A Next.js-based HOA community website with role-based access control, document management, event calendar, and user verification workflows.
 
 **Project Type**: Private HOA community portal
-**Current Status**: Phase 1 - Foundation (3 of 21 milestones completed)
+**Current Status**: Phase 1 - Foundation (4 of 21 milestones completed)
 **Current Branch**: `m00`
 **Bootstrap User Email**: `indianvillagemanor+bootstrap@gmail.com`
 
@@ -85,8 +85,8 @@ The project follows a **21-milestone** implementation plan (M00-M20) across 4 ph
 - **M00**: Project Setup ✅
 - **M01**: Anonymous User Experience ✅
 - **M02**: Database Schema and Seed Data ✅
-- **M03**: Magic Link Authentication ⬜ *(NEXT)*
-- **M04**: Menu and Navigation ⬜
+- **M03**: Magic Link Authentication ✅
+- **M04**: Menu and Navigation ⬜ *(NEXT)*
 
 ### Phase 2: User Management (M05-M08.5)
 Covers registration, verification workflow, profile management
@@ -214,28 +214,29 @@ See `.env.example` for template.
 
 ## Known Issues & Resolutions
 
-All major issues from M01 and M02 have been resolved:
+All major issues from M01, M02, and M03 have been resolved:
 - ✅ next-auth peer dependency (use --legacy-peer-deps)
 - ✅ React hydration mismatch (default rendering in WindowWithSize)
-- ✅ NextAuth SESSION_FETCH_ERROR (stub API route created)
+- ✅ NextAuth SESSION_FETCH_ERROR (real API route now configured)
 - ✅ Modal image 400 error (early return fix)
 - ✅ Tailwind border-border class (removed from CSS)
 - ✅ Schema alignment (removed isResident/isOwner fields)
 - ✅ Idempotent seed script (safe to run multiple times)
+- ✅ Prisma named exports (use `{ prisma }` import)
+- ✅ TypeScript linting errors (removed `any` types, unused parameters)
+- ✅ useSearchParams Suspense boundary (wrapped in error page)
 
-## Next Steps (M03)
+## Next Steps (M04)
 
-The next milestone is **M03: Magic Link Authentication and Basic Audit Logging**.
+The next milestone is **M04: Basic Menu and Navigation for Authenticated Users**.
 
 **Key Tasks**:
-1. Implement magic link login flow with NextAuth
-2. Set up email delivery system (Nodemailer already configured)
-3. Add rate limiting for login attempts and magic link requests
-4. Implement basic audit logging for authentication events
-5. Block pending users from logging in
-6. Add logout functionality
+1. Add role-based menu items for authenticated users
+2. Implement protected route middleware
+3. Create basic navigation structure for authenticated features
+4. Display user information in menu
 
-**See**: `docs/planning/M03-magic-link-authentication.md` for detailed requirements
+**See**: `docs/planning/M04-menu-navigation.md` for detailed requirements
 
 ## Tips for Future Agents
 
@@ -263,6 +264,6 @@ This is a private project for Indian Village Manor HOA.
 
 ---
 
-**Last Updated**: 2026-02-17 (M02 completion)
-**Document Version**: 1.0
+**Last Updated**: 2026-02-17 (M03 completion)
+**Document Version**: 1.1
 **For**: Future AI agents working on this project

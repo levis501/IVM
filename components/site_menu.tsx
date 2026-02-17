@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 
 const menuStyle = {
   position: "absolute" as const,
@@ -56,6 +57,7 @@ const headerImg = {
 
 const SiteMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -65,7 +67,10 @@ const SiteMenu = () => {
     setIsOpen(false);
   }
 
-  const loginDisabled = true; // Set to true to disable login-related menu items
+  const handleLogout = async () => {
+    closeMenu();
+    await signOut({ callbackUrl: '/' });
+  };
 
   return (
     <header style={headerStyle}>
@@ -87,11 +92,32 @@ const SiteMenu = () => {
               <li><Link href="/#home" onClick={closeMenu}>Home</Link></li>
               <li><Link href="/#floorplans" onClick={closeMenu}>Floor Plans</Link></li>
               <li><Link href="/#contact" onClick={closeMenu}>Contact</Link></li>
-              {!loginDisabled && (
+              <li><hr /></li>
+              {status === "loading" ? (
+                <li style={{ fontStyle: "italic", color: "#ccc" }}>Loading...</li>
+              ) : session ? (
                 <>
-                  <li><hr /></li>
-                  <li><Link href="/auth/login" onClick={closeMenu}>Login</Link></li>
+                  <li style={{ fontStyle: "italic", fontSize: "0.9em" }}>
+                    Signed in as: {session.user?.firstName} {session.user?.lastName}
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#f0f0f0",
+                        cursor: "pointer",
+                        padding: 0,
+                        font: "inherit"
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </li>
                 </>
+              ) : (
+                <li><Link href="/auth/login" onClick={closeMenu}>Login</Link></li>
               )}
             </ul>
           </div>
