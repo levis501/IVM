@@ -23,9 +23,11 @@ echo ""
 
 # Kill anything listening on port 3000
 echo "Checking for processes on port 3000..."
-if lsof -ti:3000 >/dev/null 2>&1; then
-    echo "Found process(es) on port 3000. Killing..."
-    lsof -ti:3000 | xargs kill -9
+PIDS=$(ss -tlnp 2>/dev/null | grep ':3000 ' | grep -oP 'pid=\K[0-9]+' | sort -u)
+if [ -n "$PIDS" ]; then
+    echo "Found process(es) on port 3000: $PIDS"
+    echo "Killing..."
+    echo "$PIDS" | xargs kill -9
     echo "Killed process(es) on port 3000"
     sleep 1
 else

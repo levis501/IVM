@@ -35,10 +35,12 @@ else
     echo "No PID file found at $PID_FILE"
     echo "Checking for any process on port 3000..."
 
-    if lsof -ti:3000 >/dev/null 2>&1; then
-        echo "Found process on port 3000, killing..."
-        lsof -ti:3000 | xargs kill -9
-        echo "Killed process on port 3000"
+    PIDS=$(ss -tlnp 2>/dev/null | grep ':3000 ' | grep -oP 'pid=\K[0-9]+' | sort -u)
+    if [ -n "$PIDS" ]; then
+        echo "Found process(es) on port 3000: $PIDS"
+        echo "Killing..."
+        echo "$PIDS" | xargs kill -9
+        echo "Killed process(es) on port 3000"
     else
         echo "No process found on port 3000"
     fi
