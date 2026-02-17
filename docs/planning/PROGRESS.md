@@ -28,85 +28,21 @@ This document tracks the completion status of all milestones in the Indian Villa
 **Status**: ⬜ Not Started
 **Started**: -
 **Completed**: -
-**Description**: Create a single long scrollable home page that matches the reference project (/home/levis/Development/IVM/IndianVillageManor/ivm_app) exactly in look, feel, and responsive behavior. This includes duplicating the grid-based layout system, all visual sections, images, and the hamburger menu navigation.
+
+**Goal**: Create a single long scrollable home page matching the reference project exactly in look, feel, and responsive behavior.
 
 **Key Deliverables**:
+- [ ] Responsive grid layout system (WindowContext, WindowWithSize, 6 grid components)
+- [ ] Hamburger menu navigation with fixed header
+- [ ] Six content sections (Home, Interiors1, Amenities, Floor Plans, Interiors2, Contact)
+- [ ] Modal component for zooming floor plan graphics
+- [ ] All image assets copied from reference (20+ images)
+- [ ] Exact styling match (IVM green theme, Noto Serif font, responsive behavior)
+- [ ] Stub authentication (login menu item disabled)
 
-**Core Components (duplicate from reference)**:
-- [ ] WindowContext and WindowWithSize for responsive layout
-- [ ] Grid system components:
-  - [ ] GridSection (container with responsive grid/flow layout)
-  - [ ] GridCell (individual grid cell with position/size)
-  - [ ] GridPhoto (photos in grid cells)
-  - [ ] GridGraphic (logos/graphics in grid cells with optional zoom)
-  - [ ] GridText (text content in grid cells)
-  - [ ] GridHeader (large headers in grid cells)
-- [ ] Modal component (for zooming floor plan graphics)
-- [ ] SiteMenuClient component with:
-  - [ ] Fixed header with IVM green background image
-  - [ ] Hamburger menu (☰ Menu) in top-right
-  - [ ] Dropdown menu overlay with IVM green background
-  - [ ] In-page navigation links (Home, Floor Plans, Contact)
-  - [ ] Login item (stub/disabled for M01 - will be functional in M03)
-- [ ] SessionProviderWrapper (stub wrapper for future NextAuth integration)
+**Reference**: `/home/levis/Development/IVM/IndianVillageManor/ivm_app`
 
-**Page Sections (matching reference exactly)**:
-- [ ] Home section (id="home"):
-  - [ ] IVM Logo graphic
-  - [ ] "INDIAN VILLAGE MANOR" header
-  - [ ] Welcome text describing the property
-  - [ ] Entrance photo (large)
-  - [ ] Riverfront West photo
-- [ ] Interiors1 section (id="interiors1"):
-  - [ ] Large interior photo #3
-  - [ ] Historical description text
-  - [ ] Interior photo #1
-- [ ] Amenities section (id="amenities", green background):
-  - [ ] Amenities description text
-  - [ ] Weight room photo
-  - [ ] First floor photo
-  - [ ] Riverfront East photo
-- [ ] Floor Plans section (id="floorplans", green background):
-  - [ ] Floor plans description text
-  - [ ] Floor plan A/B/M/N graphic (zoomable)
-  - [ ] Floor plan C/D/K/L graphic (zoomable)
-  - [ ] Floor plan E/F/G/H graphic (zoomable)
-- [ ] Interiors2 section (id="interiors2", green background):
-  - [ ] Interior photos #5, #6, #4
-  - [ ] Exterior photo
-- [ ] Contact section (id="contact"):
-  - [ ] Front door photo
-  - [ ] "Contact" header
-  - [ ] Address and phone
-  - [ ] Email link
-
-**Styling & Assets**:
-- [ ] globals.css with all reference styles:
-  - [ ] Dark green theme (.dark class with #00693f background)
-  - [ ] Noto Serif font configuration
-  - [ ] Scroll offset for fixed header navigation
-  - [ ] Tailwind configuration
-- [ ] Copy all required images from reference project to public/:
-  - [ ] Logo files (IVM Logo Design_Black_24 0225_t.png, ivm_green.png)
-  - [ ] Interior photos (1-6)
-  - [ ] Exterior photos (Entrance, Exterior, FirstFloor, WeightRoom)
-  - [ ] Riverfront photos (RiverfrontE, RiverfrontW)
-  - [ ] Floor plan graphics (all 3 floor plans in white)
-  - [ ] Front door photo (ivm_front_door.jpg)
-
-**Responsive Behavior**:
-- [ ] Desktop (>768px): Grid-based layout with precise positioning
-- [ ] Mobile/Portrait (≤768px): Vertical flow layout
-- [ ] Dynamic row height scaling based on viewport width
-- [ ] Smooth scroll-to-section behavior for menu navigation
-- [ ] Fixed header with proper scroll offset
-
-**Technical Notes**:
-- This milestone replicates the existing reference site's home page
-- Authentication is stubbed - login menu item present but disabled
-- No backend integration required yet
-- Focus on exact visual and behavioral match with reference
-- All components should be duplicated/adapted from reference code
+**Details**: See [M01-anonymous-user-experience.md](./M01-anonymous-user-experience.md)
 
 ---
 
