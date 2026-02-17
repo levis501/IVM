@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
@@ -56,8 +56,21 @@ const headerImg = {
 
 
 const SiteMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const { data: session, status } = useSession();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Open menu automatically only on fresh login (not every page load)
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      // Check if this is a fresh login
+      const justLoggedIn = sessionStorage.getItem('justLoggedIn');
+      if (justLoggedIn === 'true') {
+        setIsOpen(true);
+        // Clear the flag so menu doesn't auto-open on subsequent page navigations
+        sessionStorage.removeItem('justLoggedIn');
+      }
+    }
+  }, [status, session]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);

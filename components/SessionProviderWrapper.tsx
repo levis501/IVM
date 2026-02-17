@@ -1,13 +1,29 @@
 "use client";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
+import { useEffect, useRef } from "react";
 
-import { useEffect } from "react";
+function SessionTracker() {
+  const { data: session, status } = useSession();
+  const previousStatus = useRef(status);
+
+  useEffect(() => {
+    // Detect transition from unauthenticated/loading to authenticated
+    if (previousStatus.current !== "authenticated" && status === "authenticated") {
+      // This is a fresh login - set the flag
+      sessionStorage.setItem('justLoggedIn', 'true');
+    }
+    previousStatus.current = status;
+  }, [status, session]);
+
+  return null;
+}
 
 export default function SessionProviderWrapper({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     function handleAuthLogin(event: {data : {type: string}}) {
       if (event?.data?.type === "auth-login") {
-        // Reload or redirect to homepage after login event
+        // Set the flag before redirecting
+        sessionStorage.setItem('justLoggedIn', 'true');
         window.location.href = "/";
       }
     }
@@ -20,6 +36,7 @@ export default function SessionProviderWrapper({ children }: { children: React.R
     // Fallback: listen for localStorage events
     function handleStorage(e: StorageEvent) {
       if (e.key === "ivm_auth_login" && e.newValue) {
+        sessionStorage.setItem('justLoggedIn', 'true');
         window.location.href = "/";
       }
     }
@@ -29,5 +46,10 @@ export default function SessionProviderWrapper({ children }: { children: React.R
       window.removeEventListener("storage", handleStorage);
     };
   }, []);
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider>
+      <SessionTracker />
+      {children}
+    </SessionProvider>
+  );
 }
