@@ -25,22 +25,29 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M01: Anonymous User Experience
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
 
 **Goal**: Create a single long scrollable home page matching the reference project exactly in look, feel, and responsive behavior.
 
 **Key Deliverables**:
-- [ ] Responsive grid layout system (WindowContext, WindowWithSize, 6 grid components)
-- [ ] Hamburger menu navigation with fixed header
-- [ ] Six content sections (Home, Interiors1, Amenities, Floor Plans, Interiors2, Contact)
-- [ ] Modal component for zooming floor plan graphics
-- [ ] All image assets copied from reference (20+ images)
-- [ ] Exact styling match (IVM green theme, Noto Serif font, responsive behavior)
-- [ ] Stub authentication (login menu item disabled)
+- [x] Responsive grid layout system (WindowContext, WindowWithSize, 6 grid components)
+- [x] Hamburger menu navigation with fixed header
+- [x] Six content sections (Home, Interiors1, Amenities, Floor Plans, Interiors2, Contact)
+- [x] Modal component for zooming floor plan graphics
+- [x] All image assets copied from reference (18 images)
+- [x] Exact styling match (IVM green theme, Noto Serif font, responsive behavior)
+- [x] Stub authentication (login menu item disabled)
 
 **Reference**: `/home/levis/Development/IVM/IndianVillageManor/ivm_app`
+
+**Issues Resolved**:
+- next-auth peer dependency conflict (resolved with --legacy-peer-deps)
+- React hydration mismatch in WindowWithSize (fixed with default rendering)
+- NextAuth SESSION_FETCH_ERROR (fixed with stub API route)
+- Modal image 400 error (fixed with early return)
+- Tailwind border-border class error (removed from CSS)
 
 **Details**: See [M01-anonymous-user-experience.md](./M01-anonymous-user-experience.md)
 
@@ -283,10 +290,10 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 1
+**Completed**: 2 (M00, M01)
 **In Progress**: 0
-**Not Started**: 20
-**Overall Progress**: 5%
+**Not Started**: 19
+**Overall Progress**: 10%
 
 ---
 
@@ -294,12 +301,11 @@ This document tracks the completion status of all milestones in the Indian Villa
 **Phase 1: Foundation** - Setting up development environment and basic infrastructure
 
 ## Next Steps
-1. Begin M01: Anonymous User Experience
-   - Implement grid layout system (WindowContext, WindowWithSize, Grid components)
-   - Create hamburger menu navigation with in-page scrolling
-   - Build single long home page with 6 sections matching reference
-   - Copy all image assets from reference project
-   - Match responsive behavior and styling exactly
+1. Begin M02: Database Schema and Seed Data
+   - Complete Prisma schema with all models (User, Committee, Document, Event, AuditLog, etc.)
+   - Create initial migration
+   - Create seed script with bootstrap user
+   - Test database connection and migrations
 
 ---
 

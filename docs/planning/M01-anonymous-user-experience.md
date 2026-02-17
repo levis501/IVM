@@ -313,3 +313,126 @@ Components built in M01 will be extended in future milestones:
 - **M13**: Add audit logging for page views
 
 The grid system and layout will serve as the foundation for future authenticated pages.
+
+---
+
+## Implementation Notes
+
+**Status**: ✅ **COMPLETED** - February 17, 2026
+
+### What Was Built
+
+All planned deliverables were successfully implemented:
+
+**Core Components:**
+- ✅ WindowContext (`components/window_context.tsx`)
+- ✅ WindowWithSize (`components/window_with_size.tsx`)
+- ✅ GridSection (`components/grid/grid_section.tsx`)
+- ✅ GridCell (`components/grid/grid_cell.tsx`)
+- ✅ GridPhoto (`components/grid/grid_photo.tsx`)
+- ✅ GridGraphic (`components/grid/grid_graphic.tsx`)
+- ✅ GridText (`components/grid/grid_text.tsx`)
+- ✅ GridHeader (`components/grid/grid_header.tsx`)
+- ✅ Modal (`components/modal.tsx`)
+- ✅ SiteMenuClient (`components/SiteMenuClient.tsx`)
+- ✅ site_menu (`components/site_menu.tsx`)
+- ✅ SessionProviderWrapper (`components/SessionProviderWrapper.tsx`)
+
+**Page Structure:**
+- ✅ All 6 sections implemented (Home, Interiors1, Amenities, Floor Plans, Interiors2, Contact)
+- ✅ Home page (`app/page.tsx`) with complete content and images
+- ✅ Layout (`app/layout.tsx`) with Noto Serif font and proper structure
+
+**Assets:**
+- ✅ 18 images copied from reference project
+- ✅ All logos, photos, and floor plan graphics present
+
+**Styling:**
+- ✅ globals.css with IVM green theme (#00693f)
+- ✅ Noto Serif font configuration
+- ✅ Tailwind config with custom colors and breakpoints
+- ✅ Responsive behavior (grid on desktop, flow on mobile)
+
+**Authentication Stub:**
+- ✅ NextAuth API route (`app/api/auth/[...nextauth]/route.ts`)
+- ✅ Environment variables (NEXTAUTH_URL, NEXTAUTH_SECRET)
+- ✅ Login menu item present but disabled
+
+### Issues Encountered and Resolved
+
+**1. next-auth Installation Conflict**
+- **Issue**: npm install failed due to nodemailer version mismatch (next-auth wants v7, we have v8)
+- **Resolution**: Used `--legacy-peer-deps` flag to bypass peer dependency check
+- **Impact**: None - authentication is stubbed for M01
+
+**2. Tailwind CSS Border Error**
+- **Issue**: `border-border` class not found, causing CSS compilation error
+- **Resolution**: Removed `@apply border-border` from globals.css (line 91)
+- **Impact**: Minimal - border styling not critical for M01
+
+**3. React Hydration Mismatch**
+- **Issue**: WindowWithSize returned empty div on server, causing page not to render
+- **Resolution**: Always render children with default values instead of conditional rendering
+- **Impact**: Fixed - page now renders properly on initial load
+
+**4. NextAuth SESSION_FETCH_ERROR**
+- **Issue**: SessionProvider tried to fetch from non-existent `/api/auth/session` endpoint
+- **Resolution**: Created stub NextAuth route handler with empty providers array
+- **Added**: NEXTAUTH_URL and NEXTAUTH_SECRET environment variables
+- **Impact**: Error eliminated, SessionProvider works silently in background
+
+**5. Modal Image 400 Error**
+- **Issue**: After closing modal, Image component tried to load fallback favicon causing 400 error
+- **Resolution**: Changed Modal to return null when src is undefined (early return)
+- **Impact**: No more console errors when closing modal
+
+### Testing Results
+
+All success criteria met:
+- ✅ Home page visually matches reference site
+- ✅ Responsive behavior works (desktop grid, mobile flow)
+- ✅ All images load and display properly
+- ✅ Navigation and scrolling work smoothly
+- ✅ Modal zoom functionality works for floor plans
+- ✅ Fixed header with hamburger menu functional
+- ✅ No console errors or warnings
+- ✅ Authentication is properly stubbed (login disabled)
+
+### Known Limitations (By Design)
+
+- Login menu item is visible but disabled (will be enabled in M03)
+- No authentication functionality (by design for M01)
+- SessionProvider is present but returns null session (will be configured in M03)
+- Green background sections use `.dark` class name (matches reference implementation)
+
+### Files Created/Modified
+
+**New Files (26):**
+- 12 component files (`components/*.tsx`, `components/grid/*.tsx`)
+- 1 API route (`app/api/auth/[...nextauth]/route.ts`)
+- 18 image assets (`public/*`)
+
+**Modified Files (5):**
+- `app/globals.css` - Added IVM theme styles
+- `app/layout.tsx` - Added font, SessionProvider, SiteMenu, WindowWithSize
+- `app/page.tsx` - Implemented all 6 sections
+- `tailwind.config.ts` - Added custom colors and breakpoints
+- `.env` - Added NextAuth configuration
+
+### Development Environment
+
+- Next.js 15.5.12
+- React 18+
+- TypeScript
+- TailwindCSS
+- next-auth 4.24.13 (installed with --legacy-peer-deps)
+- Running on http://localhost:3000
+
+### Next Steps
+
+M01 is complete and ready for user acceptance testing. The foundation is in place for:
+- M02: Database Schema and Seed Data
+- M03: Magic Link Authentication
+- M04: Menu Navigation (authenticated users)
+
+All components are functioning as designed and match the reference project's look and behavior.
