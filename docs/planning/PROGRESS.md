@@ -54,13 +54,29 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M02: Database Schema and Seed Data
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
+**Goal**: Complete database schema with initial bootstrap user and seed data.
+
 **Key Deliverables**:
-- [ ] Complete Prisma schema with all models
-- [ ] Migration files
-- [ ] Seed script with bootstrap user
+- [x] Complete Prisma schema with all models (User, Role, Committee, Document, Event, AuditLog, SystemConfig, EmailTemplate)
+- [x] Migration files (removed isResident/isOwner boolean fields, replaced with role-based approach)
+- [x] Seed script with bootstrap user
+- [x] 7 standard roles (dbadmin, publisher, calendar, verifier, user, owner, resident)
+- [x] 8 SystemConfig defaults
+- [x] 6 EmailTemplate defaults
+- [x] Idempotent seed script (can run multiple times safely)
+
+**Issues Resolved**:
+- Schema alignment: Removed `isResident` and `isOwner` boolean fields in favor of role-based approach
+- Created migration: `20260217190845_remove_is_resident_is_owner_fields`
+- Seed script successfully creates bootstrap user with email: indianvillagemanor+bootstrap@gmail.com
+- All database indexes properly configured for performance
+- Verified idempotency of seed script (no duplicates on repeated runs)
+
+**Details**: See [M02-database-schema-seed.md](./M02-database-schema-seed.md)
 
 ---
 
@@ -290,10 +306,10 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 2 (M00, M01)
+**Completed**: 3 (M00, M01, M02)
 **In Progress**: 0
-**Not Started**: 19
-**Overall Progress**: 10%
+**Not Started**: 18
+**Overall Progress**: 14%
 
 ---
 
@@ -301,11 +317,12 @@ This document tracks the completion status of all milestones in the Indian Villa
 **Phase 1: Foundation** - Setting up development environment and basic infrastructure
 
 ## Next Steps
-1. Begin M02: Database Schema and Seed Data
-   - Complete Prisma schema with all models (User, Committee, Document, Event, AuditLog, etc.)
-   - Create initial migration
-   - Create seed script with bootstrap user
-   - Test database connection and migrations
+1. Begin M03: Magic Link Authentication and Basic Audit Logging
+   - Implement magic link login flow
+   - Set up email delivery system with Nodemailer
+   - Add rate limiting for login attempts and magic link requests
+   - Implement basic audit logging for authentication events
+   - Block pending users from logging in
 
 ---
 
