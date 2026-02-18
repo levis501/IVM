@@ -1,5 +1,7 @@
 # Milestone 11: Event Calendar System
 
+**Status**: ✅ Completed (2026-02-17)
+
 **Goal**: Calendar role can manage events; public can view current/future events.
 
 **Features**:

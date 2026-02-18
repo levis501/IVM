@@ -314,7 +314,7 @@ const SiteMenu = () => {
                       onMouseEnter={() => setHoveredItem('events')}
                       onMouseLeave={() => setHoveredItem(null)}
                     >
-                      Events
+                      Calendar
                     </Link>
                   </li>
                   <li style={{ padding: 0 }}>

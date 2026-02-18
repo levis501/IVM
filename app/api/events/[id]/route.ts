@@ -4,49 +4,40 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logAuditEvent } from '@/lib/audit';
 
-// GET: List events with past event filtering based on verification status
-export async function GET(_request: NextRequest) {
-  const session = await getServerSession(authOptions);
+// GET: Get a single event by ID
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
 
-  // Calculate the start of the current calendar month
-  const now = new Date();
-  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const event = await prisma.event.findUnique({
+    where: { id },
+  });
 
-  // Determine if user is verified
-  const isVerified = session?.user?.verificationStatus === 'verified';
-
-  let events;
-  if (isVerified) {
-    // Verified users see all events (past and current)
-    events = await prisma.event.findMany({
-      orderBy: { startAt: 'asc' },
-    });
-  } else {
-    // Anonymous/non-verified users see only events from current month onward
-    events = await prisma.event.findMany({
-      where: {
-        startAt: { gte: currentMonthStart },
-      },
-      orderBy: { startAt: 'asc' },
-    });
+  if (!event) {
+    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
   return NextResponse.json({
-    events: events.map(e => ({
-      id: e.id,
-      title: e.title,
-      description: e.description,
-      startAt: e.startAt.toISOString(),
-      endAt: e.endAt?.toISOString() || null,
-      createdAt: e.createdAt.toISOString(),
-    })),
-    isVerified,
-    currentMonthStart: currentMonthStart.toISOString(),
+    event: {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      startAt: event.startAt.toISOString(),
+      endAt: event.endAt?.toISOString() || null,
+      createdAt: event.createdAt.toISOString(),
+      createdBy: event.createdBy,
+    },
   });
 }
 
-// POST: Create a new event (calendar role or dbadmin required)
-export async function POST(request: NextRequest) {
+// PUT: Update an event (calendar role or dbadmin required)
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
@@ -58,6 +49,11 @@ export async function POST(request: NextRequest) {
 
   if (!canManageEvents) {
     return NextResponse.json({ error: 'Forbidden: calendar role required' }, { status: 403 });
+  }
+
+  const existing = await prisma.event.findUnique({ where: { id } });
+  if (!existing) {
+    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
   let body: { title?: string; description?: string; startAt?: string; endAt?: string };
@@ -91,19 +87,20 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const event = await prisma.event.create({
+  const event = await prisma.event.update({
+    where: { id },
     data: {
       title: title.trim(),
       description: description?.trim() || null,
       startAt: startDate,
       endAt: endDate,
-      createdBy: session.user.id,
+      updatedBy: session.user.id,
     },
   });
 
   await logAuditEvent({
     userId: session.user.id,
-    action: 'event_created',
+    action: 'event_updated',
     entityType: 'Event',
     entityId: event.id,
     details: { title: event.title, startAt: event.startAt.toISOString() },
@@ -121,5 +118,45 @@ export async function POST(request: NextRequest) {
       endAt: event.endAt?.toISOString() || null,
       createdAt: event.createdAt.toISOString(),
     },
-  }, { status: 201 });
+  });
+}
+
+// DELETE: Delete an event (calendar role or dbadmin required)
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const roles = session.user.roles || [];
+  const canManageEvents = roles.includes('calendar') || roles.includes('dbadmin');
+
+  if (!canManageEvents) {
+    return NextResponse.json({ error: 'Forbidden: calendar role required' }, { status: 403 });
+  }
+
+  const existing = await prisma.event.findUnique({ where: { id } });
+  if (!existing) {
+    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+  }
+
+  await prisma.event.delete({ where: { id } });
+
+  await logAuditEvent({
+    userId: session.user.id,
+    action: 'event_deleted',
+    entityType: 'Event',
+    entityId: id,
+    details: { title: existing.title, startAt: existing.startAt.toISOString() },
+    ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+    userAgent: request.headers.get('user-agent') || undefined,
+    success: true,
+  });
+
+  return NextResponse.json({ success: true });
 }

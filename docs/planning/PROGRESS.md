@@ -451,13 +451,36 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M11: Event Calendar System
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
 **Key Deliverables**:
-- [ ] Event CRUD operations
-- [ ] Calendar view with date filtering
-- [ ] Calendar link in menu
+- [x] Event CRUD operations via API (POST/PUT/DELETE requiring calendar or dbadmin role)
+- [x] Event management pages: /events/new (create) and /events/[id]/edit (edit)
+- [x] Calendar view at /events with month divider groupings
+- [x] Past events visually indicated (reduced opacity + "Past" badge)
+- [x] Inline delete confirmation modal (no browser alert)
+- [x] Date-based filtering: public sees current month+; verified users see all events
+- [x] Calendar link in hamburger menu for all verified users (renamed "Events" → "Calendar")
+- [x] Access denied message for non-calendar users visiting manage pages
+- [x] Login callout for anonymous users explaining past events require login
+- [x] Audit log for event_created, event_updated, event_deleted
+
+**New Files Created**:
+- `app/api/events/[id]/route.ts` - GET/PUT/DELETE single event
+- `app/events/new/page.tsx` - Create event form (calendar/dbadmin)
+- `app/events/[id]/edit/page.tsx` - Edit event form (calendar/dbadmin)
+
+**Files Modified**:
+- `app/api/events/route.ts` - Added POST handler; changed GET ordering to asc
+- `app/events/page.tsx` - Full rewrite with month groups, badges, edit/delete, callout
+- `components/site_menu.tsx` - Renamed "Events" label to "Calendar"
+
+**Technical Notes**:
+- Next.js 15 async params pattern used in edit page (`params.then()`)
+- Middleware already covered /events:path* so no changes needed there
+- endAt validation: if provided, must be after startAt
 
 ---
 
