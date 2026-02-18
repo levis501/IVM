@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { sendEmail, replaceTemplateVariables } from '@/lib/email';
 import { logAuditEvent } from '@/lib/audit';
+import { createMagicLink } from '@/lib/magic-link';
 
 // GET: List pending users for verifier dashboard
 export async function GET(_request: NextRequest) {
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (template) {
-    const loginLink = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/login`;
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
     const variables: Record<string, string> = {
       firstName: targetUser.firstName,
       lastName: targetUser.lastName,
@@ -135,7 +136,13 @@ export async function POST(request: NextRequest) {
     };
 
     if (action === 'approve') {
-      variables.loginLink = loginLink;
+      // Generate a one-time magic link so the user is logged in automatically
+      try {
+        variables.loginLink = await createMagicLink(targetUser.email, `${baseUrl}/dashboard`);
+      } catch (linkError) {
+        console.error(`Failed to create magic link for approved user ${targetUser.email}:`, linkError);
+        variables.loginLink = `${baseUrl}/auth/login`;
+      }
     } else {
       variables.reason = comment || 'Your registration could not be verified at this time.';
       variables.contactEmail = process.env.EMAIL_FROM || 'noreply@indianvillagemanor.org';

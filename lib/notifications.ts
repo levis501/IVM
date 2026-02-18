@@ -1,6 +1,7 @@
 import { prisma } from './prisma';
 import { sendEmail, replaceTemplateVariables } from './email';
 import { logAuditEvent } from './audit';
+import { createMagicLink } from './magic-link';
 
 export interface NewUserDetails {
   id: string;
@@ -52,11 +53,21 @@ export async function sendVerifierNotification(newUser: NewUserDetails): Promise
 
   const isResident = newUser.roles.includes('resident') ? 'Yes' : 'No';
   const isOwner = newUser.roles.includes('owner') ? 'Yes' : 'No';
-  const verificationLink = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/admin/verify`;
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
   const failedVerifiers: string[] = [];
 
   for (const verifier of verifiers) {
+    // Generate a unique per-verifier magic link so clicking it logs them in
+    let verificationLink: string;
+    try {
+      verificationLink = await createMagicLink(verifier.email, `${baseUrl}/admin/verify`);
+    } catch (linkError) {
+      console.error(`❌ Failed to create magic link for verifier ${verifier.email}:`, linkError);
+      // Fall back to plain login link so the verifier still gets notified
+      verificationLink = `${baseUrl}/auth/login`;
+    }
+
     const emailBody = replaceTemplateVariables(template.body, {
       firstName: newUser.firstName,
       lastName: newUser.lastName,

@@ -106,13 +106,13 @@ export const authOptions: AuthOptions = {
       if (dbUser.verificationStatus === 'pending') {
         // Pending users cannot log in
         await logLoginAttempt(user.email!, false, undefined, undefined, dbUser.id, 'pending_verification');
-        return '/auth/error?error=PendingVerification';
+        return `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/error?error=PendingVerification`;
       }
 
       if (dbUser.verificationStatus === 'denied') {
         // Denied users cannot log in
         await logLoginAttempt(user.email!, false, undefined, undefined, dbUser.id, 'verification_denied');
-        return '/auth/error?error=VerificationDenied';
+        return `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/error?error=VerificationDenied`;
       }
 
       // User is verified - allow sign in
