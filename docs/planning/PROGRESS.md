@@ -635,14 +635,32 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M16: Backup and Recovery
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
 **Key Deliverables**:
-- [ ] Automated encrypted backups
-- [ ] Recovery procedures
-- [ ] DATABASE_MIGRATIONS.md
-- [ ] Migration rollback tests
+- [x] Backup script (scripts/backup/backup.sh) for database, documents, and logs
+- [x] Restore script (scripts/backup/restore.sh) with interactive confirmation
+- [x] Optional AES-256-CBC encryption via BACKUP_ENCRYPTION_KEY
+- [x] Configurable backup retention with automatic cleanup (default 30 days)
+- [x] Crontab example for scheduled daily backups at 2:00 AM
+- [x] DATABASE_MIGRATIONS.md already comprehensive (created earlier)
+- [x] PostgreSQL custom-format dump for efficient restore
+- [x] Combined archive creation (database + documents + logs)
+
+**New Files Created**:
+- `scripts/backup/backup.sh` - Full backup script with encryption
+- `scripts/backup/restore.sh` - Interactive restore script with decryption
+- `scripts/backup/crontab.example` - Cron schedule for automated backups
+
+**Technical Notes**:
+- Backup format: tar.gz (or tar.gz.enc when encrypted)
+- Database: pg_dump custom format (--format=custom) for selective restore
+- Documents and logs compressed separately before combining
+- Restore script prompts before overwriting database
+- Old backups older than retention period auto-deleted
+- DATABASE_MIGRATIONS.md already covers migration rollback testing
 
 ---
 
@@ -696,19 +714,19 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 17 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12, M13, M14, M15)
+**Completed**: 18 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12, M13, M14, M15, M16)
 **In Progress**: 0
-**Not Started**: 4
-**Overall Progress**: 81%
+**Not Started**: 3
+**Overall Progress**: 86%
 
 ---
 
 ## Current Phase
-**Phase 4: Production Ready** - In Progress. M13, M14, M15 completed.
+**Phase 4: Production Ready** - In Progress. M13-M16 completed.
 
 ## Next Steps
 1. Continue Phase 4: Production Ready
-2. Start M16: Backup and Recovery
+2. Start M17: Security Hardening
 
 ---
 

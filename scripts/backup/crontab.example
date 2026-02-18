@@ -1,0 +1,15 @@
+# IVM Backup Cron Schedule
+# Install with: crontab scripts/backup/crontab.example
+# Or add to system crontab: /etc/cron.d/ivm-backup
+
+# Environment variables (adjust for your setup)
+BACKUP_DIR=/data/backups
+BACKUP_RETENTION_DAYS=30
+POSTGRES_USER=ivm_user
+POSTGRES_PASSWORD=ivm_password
+POSTGRES_DB=ivm_db
+POSTGRES_HOST=postgres
+BACKUP_ENCRYPTION_KEY=your-encryption-key-here
+
+# Daily backup at 2:00 AM
+0 2 * * * /app/scripts/backup/backup.sh >> /data/logs/backup.log 2>&1
