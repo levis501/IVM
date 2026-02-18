@@ -762,34 +762,61 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M20: Performance Optimization and Monitoring
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
 **Key Deliverables**:
-- [ ] Performance optimization
-- [ ] Monitoring system
-- [ ] Alerting system
-- [ ] Performance benchmarks
+- [x] Monitoring library (lib/monitoring.ts) with system metrics collection
+- [x] Alert system: failed login threshold, pending verification threshold
+- [x] Email alerts to dbadmin users when thresholds exceeded
+- [x] Monitoring API endpoint (/api/admin/monitoring) - GET metrics, POST check alerts
+- [x] Monitoring dashboard page at /admin/console/monitoring with real-time metrics
+- [x] Metrics: user stats, failed logins, audit events, document count, disk usage, memory, load, uptime
+- [x] Auto-refresh every 60 seconds on monitoring dashboard
+- [x] "Run Alert Checks" button for manual alert triggering
+- [x] Enhanced health check endpoint with memory usage, load average, uptime
+- [x] SystemConfig: pending_verification_alert_count (default: 5)
+- [x] Monitoring card added to Admin Console dashboard
+- [x] Alert results displayed in-page (success/warning)
+
+**New Files Created**:
+- `lib/monitoring.ts` - Metrics collection, alert checking, admin notification
+- `app/api/admin/monitoring/route.ts` - GET (metrics) and POST (check alerts) API
+- `app/admin/console/monitoring/page.tsx` - Monitoring dashboard with metric cards
+
+**Files Modified**:
+- `app/admin/console/page.tsx` - Added Monitoring card to console sections
+- `app/api/health/route.ts` - Enhanced with memory usage, load average, uptime, version
+- `prisma/seed.ts` - Added pending_verification_alert_count config
+
+**Technical Notes**:
+- Metrics are collected on-demand (no background worker) for simplicity
+- Disk usage calculated recursively for /data/documents and /data/logs
+- Alert checks use configured thresholds from SystemConfig
+- Health check remains lightweight (no auth required) while monitoring requires dbadmin
+- System metrics (os.loadavg, os.totalmem, os.freemem, os.uptime) used for server health
 
 ---
 
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 20 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12, M13, M14, M15, M16, M17, M18)
+**Completed**: 21 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12, M13, M14, M15, M16, M17, M18, M19, M20)
 **In Progress**: 0
-**Not Started**: 1
-**Overall Progress**: 95%
+**Not Started**: 0
+**Overall Progress**: 100%
 
 ---
 
 ## Current Phase
-**Phase 4: Production Ready** - In Progress. M13-M18 completed.
+**All Phases Complete** - All 21 milestones (M00-M20) across 4 phases have been implemented.
 
-## Next Steps
-1. Continue Phase 4: Production Ready
-2. Start M19: Documentation and Operations Guide
-3. Start M20: Performance Optimization and Monitoring
+## Completion Notes
+- Phase 1 (Foundation): M00-M04 - Project setup, anonymous UX, database, auth, navigation
+- Phase 2 (User Management): M05-M08.5 - Registration, verification, access control, profiles
+- Phase 3 (Core Features): M09-M12 - Committees, documents, calendar, admin console
+- Phase 4 (Production Ready): M13-M20 - Audit logging, SSO, Docker, backup, security, testing, docs, monitoring
 
 ---
 

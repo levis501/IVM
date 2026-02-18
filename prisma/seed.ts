@@ -102,6 +102,11 @@ async function main() {
       value: '3',
       description: 'Failed logins before dbadmin alert',
     },
+    {
+      key: 'pending_verification_alert_count',
+      value: '5',
+      description: 'Pending verifications before dbadmin alert',
+    },
   ];
 
   for (const config of systemConfigs) {

@@ -107,6 +107,12 @@ const CONSOLE_SECTIONS: NavCard[] = [
     title: 'Audit Logs',
     description: 'View, search, filter, and export all audit log entries. Run log retention cleanup.',
   },
+  {
+    href: '/admin/console/monitoring',
+    icon: '📊',
+    title: 'Monitoring',
+    description: 'System health metrics, storage usage, failed login tracking, and alert checks.',
+  },
 ];
 
 const OTHER_ADMIN_LINKS: NavCard[] = [
