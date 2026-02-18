@@ -1,0 +1,11 @@
+# Dependencies
+node_modules
+.next
+.git
+.gitignore
+*.md
+docs/
+IndianVillageManor/
+.env
+.env.local
+.env.*.local
