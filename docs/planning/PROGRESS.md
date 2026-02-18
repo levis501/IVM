@@ -485,14 +485,43 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M12: Database Admin Console
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
 **Key Deliverables**:
-- [ ] Admin console interface
-- [ ] Bulk operations
-- [ ] SystemConfig management UI
-- [ ] EmailTemplate management UI
+- [x] Admin console main dashboard at /admin/console with navigation cards
+- [x] User list page with search, status filter, role/verification badges
+- [x] User edit page with profile, role assignment, committee membership
+- [x] Bulk operations: assign role and add to committee for multiple users
+- [x] SystemConfig management UI with inline editing and numeric validation
+- [x] EmailTemplate management UI with accordion editor, variable chips, character count
+- [x] API routes for user CRUD, bulk ops, config, and template management
+- [x] Audit logging for all admin actions (profile, roles, committees, config, templates, bulk)
+- [x] Only dbadmin can access admin console (middleware + page-level checks)
+- [x] "Admin Console" link already added in site menu (M09)
+
+**New Files Created**:
+- `app/admin/console/page.tsx` - Admin console dashboard
+- `app/admin/console/users/page.tsx` - User list with bulk operations
+- `app/admin/console/users/[id]/page.tsx` - User edit page
+- `app/admin/console/config/page.tsx` - SystemConfig editor
+- `app/admin/console/templates/page.tsx` - EmailTemplate accordion editor
+- `app/api/admin/users/[id]/route.ts` - GET/PUT single user
+- `app/api/admin/users/bulk/route.ts` - Bulk role/committee assignment
+- `app/api/admin/config/route.ts` - GET/PUT system config
+- `app/api/admin/templates/route.ts` - GET email templates list
+- `app/api/admin/templates/[id]/route.ts` - GET/PUT single email template
+
+**Files Modified**:
+- `app/api/admin/users/route.ts` - Added ?all=true param for full user list
+- `middleware.ts` - Added /admin/console to ADMIN_ROUTES
+
+**Technical Notes**:
+- Numeric SystemConfig keys validated as positive integers
+- Bulk operations skip already-assigned roles/committees, per-user audit log entries
+- Email template variables parsed from JSON `variables` field and shown as chips
+- User role/committee updates are set-replace (not additive) via disconnect/connect
 
 ---
 
@@ -595,22 +624,19 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 10 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5)
+**Completed**: 14 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12)
 **In Progress**: 0
-**Not Started**: 11
-**Overall Progress**: 48%
+**Not Started**: 7
+**Overall Progress**: 67%
 
 ---
 
 ## Current Phase
-**Phase 2: User Management** - ✅ Complete. All milestones (M05-M08.5) finished.
+**Phase 3: Core Features** - ✅ Complete. All milestones (M09-M12) finished.
 
 ## Next Steps
-1. Start Phase 3: Core Features
-2. Start M09: Committee System
-   - Committee CRUD operations
-   - Many-to-many membership
-   - Committee permissions
+1. Start Phase 4: Production Ready
+2. Start M13: Comprehensive Audit Logging System
 
 ---
 

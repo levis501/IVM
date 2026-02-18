@@ -18,6 +18,7 @@ const VERIFIER_ROUTES = [
 // Routes that require dbadmin role (checked at page/API level, middleware just ensures auth)
 const ADMIN_ROUTES = [
   '/admin/committees',
+  '/admin/console',
 ];
 
 export async function middleware(request: NextRequest) {
