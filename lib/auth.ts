@@ -1,5 +1,7 @@
 import { AuthOptions } from 'next-auth';
 import EmailProvider from 'next-auth/providers/email';
+import GoogleProvider from 'next-auth/providers/google';
+import AzureADProvider from 'next-auth/providers/azure-ad';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from './prisma';
 import { sendEmail, replaceTemplateVariables } from './email';
@@ -10,11 +12,36 @@ import {
   checkRateLimit
 } from './audit';
 
-export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  providers: [
+// Build providers list dynamically based on available env vars
+function buildProviders() {
+  const providers = [];
+
+  // Google OAuth (optional - only if credentials configured)
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    providers.push(
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        allowDangerousEmailAccountLinking: true,
+      })
+    );
+  }
+
+  // Microsoft / Azure AD OAuth (optional - only if credentials configured)
+  if (process.env.AZURE_AD_CLIENT_ID && process.env.AZURE_AD_CLIENT_SECRET) {
+    providers.push(
+      AzureADProvider({
+        clientId: process.env.AZURE_AD_CLIENT_ID,
+        clientSecret: process.env.AZURE_AD_CLIENT_SECRET,
+        tenantId: process.env.AZURE_AD_TENANT_ID || 'common',
+        allowDangerousEmailAccountLinking: true,
+      })
+    );
+  }
+
+  // Email provider (magic link) - always available
+  providers.push(
     EmailProvider({
-      // Support both EMAIL_SERVER connection string and individual fields
       server: process.env.EMAIL_SERVER || {
         host: process.env.EMAIL_HOST!,
         port: parseInt(process.env.EMAIL_PORT || '587'),
@@ -24,25 +51,21 @@ export const authOptions: AuthOptions = {
         },
       },
       from: process.env.EMAIL_FROM!,
-      maxAge: parseInt(process.env.MAGIC_LINK_EXPIRY_MINUTES || '15') * 60, // 15 minutes default
+      maxAge: parseInt(process.env.MAGIC_LINK_EXPIRY_MINUTES || '15') * 60,
       async sendVerificationRequest({ identifier: email, url }) {
-        // Check rate limit
         const rateLimitConfig = await prisma.systemConfig.findUnique({
           where: { key: 'rate_limit_magic_link_requests' },
         });
         const maxAttempts = parseInt(rateLimitConfig?.value || '3');
-
         const rateLimit = await checkRateLimit(email, 'magic-link', maxAttempts, 60);
 
         if (!rateLimit.allowed) {
-          // Log failed attempt due to rate limit
           await logMagicLinkRequest(email, false, undefined, undefined, 'rate_limit_exceeded');
           throw new Error(
             `Too many magic link requests. Please try again after ${rateLimit.resetAt.toLocaleTimeString()}`
           );
         }
 
-        // Fetch the magic-link email template from database
         const template = await prisma.emailTemplate.findUnique({
           where: { key: 'magic-link' },
         });
@@ -51,11 +74,9 @@ export const authOptions: AuthOptions = {
           throw new Error('Magic link email template not found');
         }
 
-        // Get expiry time in minutes
         const expiryMinutes = parseInt(process.env.MAGIC_LINK_EXPIRY_MINUTES || '15');
         const expiresIn = `${expiryMinutes} minutes`;
 
-        // Replace template variables
         const emailBody = replaceTemplateVariables(template.body, {
           email,
           link: url,
@@ -69,17 +90,21 @@ export const authOptions: AuthOptions = {
             text: emailBody,
             html: emailBody.replace(/\n/g, '<br>'),
           });
-
-          // Log successful magic link request
           await logMagicLinkRequest(email, true);
         } catch (error) {
-          // Log failed magic link request
           await logMagicLinkRequest(email, false, undefined, undefined, 'email_send_failed');
           throw error;
         }
       },
-    }),
-  ],
+    })
+  );
+
+  return providers;
+}
+
+export const authOptions: AuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: buildProviders(),
   pages: {
     signIn: '/auth/login',
     verifyRequest: '/auth/verify-request',
@@ -87,70 +112,61 @@ export const authOptions: AuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 90 * 24 * 60 * 60, // 90 days (will be read from SystemConfig in callback)
+    maxAge: 90 * 24 * 60 * 60,
   },
   callbacks: {
-    async signIn({ user }) {
-      // Get user from database to check verification status
+    async signIn({ user, account }) {
       const dbUser = await prisma.user.findUnique({
         where: { email: user.email! },
       });
 
-      // Check if user exists and is not pending
       if (!dbUser) {
-        // User doesn't exist - block sign in
+        // For OAuth: user must register first
+        if (account?.provider !== 'email') {
+          await logLoginAttempt(user.email!, false, undefined, undefined, undefined, `sso_user_not_registered:${account?.provider}`);
+          return `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/error?error=SSONotRegistered`;
+        }
         await logLoginAttempt(user.email!, false, undefined, undefined, undefined, 'user_not_found');
         return false;
       }
 
       if (dbUser.verificationStatus === 'pending') {
-        // Pending users cannot log in
         await logLoginAttempt(user.email!, false, undefined, undefined, dbUser.id, 'pending_verification');
         return `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/error?error=PendingVerification`;
       }
 
       if (dbUser.verificationStatus === 'denied') {
-        // Denied users cannot log in
         await logLoginAttempt(user.email!, false, undefined, undefined, dbUser.id, 'verification_denied');
         return `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/error?error=VerificationDenied`;
       }
 
-      // User is verified - allow sign in
-      await logLoginAttempt(user.email!, true, undefined, undefined, dbUser.id);
+      const provider = account?.provider || 'email';
+      await logLoginAttempt(user.email!, true, undefined, undefined, dbUser.id, `provider:${provider}`);
       return true;
     },
 
     async jwt({ token, user }) {
-      // Add user ID to token on first sign in
       if (user) {
         token.userId = user.id;
         token.email = user.email;
-
-        // Log session created
         await logSessionCreated(user.id, user.email!, undefined, undefined);
       }
-
       return token;
     },
 
     async session({ session, token }) {
-      // Get session timeout from SystemConfig
       const sessionConfig = await prisma.systemConfig.findUnique({
         where: { key: 'session_timeout_days' },
       });
       const sessionTimeoutDays = parseInt(sessionConfig?.value || '90');
 
-      // Add custom fields to session
       if (token && session.user) {
         session.user.id = token.userId as string;
         session.expires = new Date(Date.now() + sessionTimeoutDays * 24 * 60 * 60 * 1000).toISOString();
 
-        // Fetch full user details including verification status and roles
         const dbUser = await prisma.user.findUnique({
           where: { id: token.userId as string },
-          include: {
-            roles: true,
-          },
+          include: { roles: true },
         });
 
         if (dbUser) {
@@ -166,11 +182,9 @@ export const authOptions: AuthOptions = {
   },
   events: {
     async signOut({ token }) {
-      // Log logout event
       if (token?.email) {
         const email = token.email as string;
         const userId = token.userId as string;
-        // Don't await to avoid blocking the signout
         logLoginAttempt(email, true, undefined, undefined, userId, 'logout').catch(console.error);
       }
     },

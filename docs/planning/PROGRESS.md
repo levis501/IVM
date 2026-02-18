@@ -565,13 +565,37 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M14: SSO Authentication
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
 **Key Deliverables**:
-- [ ] Google SSO
-- [ ] Microsoft SSO
-- [ ] SSO configuration
+- [x] Google OAuth provider (conditional on GOOGLE_CLIENT_ID/SECRET env vars)
+- [x] Microsoft / Azure AD OAuth provider (conditional on AZURE_AD_CLIENT_ID/SECRET env vars)
+- [x] Dynamic provider loading - SSO buttons only appear if credentials are configured
+- [x] Login page updated with SSO buttons (Google icon, Microsoft icon) and "or continue with email" divider
+- [x] SSO account linking to existing users by email (allowDangerousEmailAccountLinking)
+- [x] Unregistered SSO users redirected to error page with "Registration Required" message
+- [x] Auth error page updated with SSONotRegistered error handling
+- [x] .env.example updated with SSO configuration variables
+- [x] Provider info API endpoint (/api/auth/providers-info) for client-side provider discovery
+- [x] Magic link still works alongside SSO (always available)
+- [x] Audit logging includes provider name for SSO logins
+
+**New Files Created**:
+- `app/api/auth/providers-info/route.ts` - Returns list of configured SSO providers
+
+**Files Modified**:
+- `lib/auth.ts` - Added Google and Azure AD providers with dynamic loading
+- `app/auth/login/page.tsx` - SSO buttons with provider icons, divider
+- `app/auth/error/page.tsx` - Added SSONotRegistered error case
+- `.env.example` - Added SSO environment variables
+
+**Technical Notes**:
+- SSO is fully optional - when no OAuth env vars are set, login page shows only magic link (no visual change)
+- Uses `allowDangerousEmailAccountLinking: true` so SSO accounts auto-link to existing users by email
+- Users must register first before SSO sign-in will work (unregistered SSO users see error page)
+- Azure AD uses `tenantId: 'common'` by default for any Microsoft account
 
 ---
 
@@ -649,19 +673,19 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 15 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12, M13)
+**Completed**: 16 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12, M13, M14)
 **In Progress**: 0
-**Not Started**: 6
-**Overall Progress**: 71%
+**Not Started**: 5
+**Overall Progress**: 76%
 
 ---
 
 ## Current Phase
-**Phase 4: Production Ready** - In Progress. M13 completed.
+**Phase 4: Production Ready** - In Progress. M13, M14 completed.
 
 ## Next Steps
 1. Continue Phase 4: Production Ready
-2. Start M14: SSO Authentication
+2. Start M15: Containerization and Deployment
 
 ---
 

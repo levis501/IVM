@@ -33,6 +33,11 @@ function AuthErrorContent() {
       message = 'You do not have permission to access this resource.';
       suggestion = 'If you believe this is an error, please contact support.';
       break;
+    case 'SSONotRegistered':
+      title = 'Registration Required';
+      message = 'No account found for this email address. You must register before signing in with SSO.';
+      suggestion = 'Please register for an account first, then sign in after your account is verified.';
+      break;
     case 'Verification':
       title = 'Verification Failed';
       message = 'The magic link may have expired or is invalid.';
