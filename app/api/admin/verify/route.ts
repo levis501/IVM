@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
       variables.loginLink = loginLink;
     } else {
       variables.reason = comment || 'Your registration could not be verified at this time.';
-      variables.contactEmail = process.env.EMAIL_FROM || 'noreply@indianvillagemanor.com';
+      variables.contactEmail = process.env.EMAIL_FROM || 'noreply@indianvillagemanor.org';
       variables.contactPhone = '(313) 555-0100';
     }
 

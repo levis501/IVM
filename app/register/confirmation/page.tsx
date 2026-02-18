@@ -67,13 +67,7 @@ export default function RegistrationConfirmationPage() {
           </Link>
 
           <p className="text-center text-sm text-gray-600">
-            Questions? Contact us at{' '}
-            <a
-              href="mailto:info@indianvillagemanor.com"
-              className="text-[#2d5016] hover:underline"
-            >
-              info@indianvillagemanor.com
-            </a>
+            Questions? Please contact the office.
           </p>
         </div>
       </div>
