@@ -412,14 +412,41 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M10: Document Publishing System
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
 **Key Deliverables**:
-- [ ] Document upload
-- [ ] Publish/archive/delete workflow
-- [ ] Restore functionality
-- [ ] Committee trash
+- [x] Document upload API with MIME type + file extension + size validation
+- [x] Filename sanitization (spaces to underscores, UUID prefix for collision prevention)
+- [x] Publisher interface at /committees/[id]/documents (publisher + committee member or dbadmin)
+- [x] Publish/archive/delete workflow via PATCH and DELETE endpoints
+- [x] Restore functionality (restore deleted → archived state)
+- [x] Permanent delete from trash
+- [x] Committee trash section in publisher UI
+- [x] Document download API with path traversal protection and access control
+- [x] Auto-create /data/documents/<committeeId> and .trash directories on demand
+- [x] "Manage Documents" button on committee detail page for authorized publishers
+- [x] "Download" links on published documents for verified users
+- [x] Audit logging for all document actions (upload, publish, archive, delete, restore, permanent delete)
+
+**New Files Created**:
+- `app/api/committees/[id]/documents/route.ts` - Upload and list documents
+- `app/api/documents/[id]/route.ts` - PATCH (publish/archive) and DELETE (soft delete)
+- `app/api/documents/[id]/restore/route.ts` - Restore deleted document
+- `app/api/documents/[id]/permanent/route.ts` - Permanently delete from trash
+- `app/api/documents/[id]/download/route.ts` - Serve document file
+- `app/committees/[id]/documents/page.tsx` - Publisher document management UI
+
+**Files Modified**:
+- `app/committees/[id]/page.tsx` - Added "Manage Documents" button and download links
+
+**Technical Notes**:
+- Files stored at `/data/documents/<committeeId>/<uuid>_<sanitized-name>.<ext>`
+- Deleted files moved to `/data/documents/<committeeId>/.trash/<filename>`
+- Download endpoint validates path cannot escape /data/documents (no path traversal)
+- Missing file on disk is handled gracefully (logs warning, does not fail request)
+- max_upload_size_mb read from SystemConfig (default 25 MB)
 
 ---
 

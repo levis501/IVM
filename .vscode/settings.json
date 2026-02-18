@@ -11,6 +11,7 @@
     "/home/levis/Development/IVM/test-register.sh": true,
     "/home/levis/Development/IVM/test-validation.sh": true,
     "npx tsc": true,
-    "npx next": true
+    "npx next": true,
+    "npm i": true
   }
 }

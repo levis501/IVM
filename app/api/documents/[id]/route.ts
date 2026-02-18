@@ -1,0 +1,201 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { logAuditEvent } from '@/lib/audit';
+import path from 'path';
+import fs from 'fs/promises';
+
+const DOCUMENTS_BASE = '/data/documents';
+
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
+
+// Ensure directory exists (using try/catch instead of existsSync)
+async function ensureDir(dir: string): Promise<void> {
+  try {
+    await fs.access(dir);
+  } catch {
+    await fs.mkdir(dir, { recursive: true });
+  }
+}
+
+// Shared helper: get user with roles/committees from session
+async function getAuthorizedUser(sessionUserId: string) {
+  return prisma.user.findUnique({
+    where: { id: sessionUserId },
+    include: {
+      roles: true,
+      committees: { select: { id: true } },
+    },
+  });
+}
+
+// PATCH /api/documents/[id] - Publish or archive a document
+export async function PATCH(request: NextRequest, { params }: RouteParams) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { id: documentId } = await params;
+
+  const user = await getAuthorizedUser(session.user.id);
+  if (!user || user.verificationStatus !== 'verified') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const document = await prisma.document.findUnique({ where: { id: documentId } });
+  if (!document) {
+    return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+  }
+
+  const isAdmin = user.roles.some(r => r.name === 'dbadmin');
+  const isPublisher = user.roles.some(r => r.name === 'publisher');
+  const isMember = user.committees.some(c => c.id === document.committeeId);
+
+  if (!isAdmin && !(isPublisher && isMember)) {
+    return NextResponse.json(
+      { error: 'Forbidden: publisher role and committee membership required' },
+      { status: 403 }
+    );
+  }
+
+  if (document.deleted) {
+    return NextResponse.json(
+      { error: 'Cannot change state of a deleted document' },
+      { status: 400 }
+    );
+  }
+
+  let body: { action?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  const { action } = body;
+
+  if (action !== 'publish' && action !== 'archive') {
+    return NextResponse.json(
+      { error: 'action must be "publish" or "archive"' },
+      { status: 400 }
+    );
+  }
+
+  let updateData: Record<string, boolean>;
+  let auditAction: string;
+
+  if (action === 'publish') {
+    updateData = { published: true, archived: false };
+    auditAction = 'document_published';
+  } else {
+    // archive
+    updateData = { archived: true, published: false };
+    auditAction = 'document_archived';
+  }
+
+  const updated = await prisma.document.update({
+    where: { id: documentId },
+    data: updateData,
+  });
+
+  await logAuditEvent({
+    userId: session.user.id,
+    action: auditAction,
+    entityType: 'Document',
+    entityId: documentId,
+    success: true,
+    details: { committeeId: document.committeeId, title: document.title, action },
+    ipAddress:
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip') ||
+      'unknown',
+    userAgent: request.headers.get('user-agent') || 'unknown',
+  });
+
+  return NextResponse.json({ document: updated });
+}
+
+// DELETE /api/documents/[id] - Soft delete (move to trash)
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { id: documentId } = await params;
+
+  const user = await getAuthorizedUser(session.user.id);
+  if (!user || user.verificationStatus !== 'verified') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const document = await prisma.document.findUnique({ where: { id: documentId } });
+  if (!document) {
+    return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+  }
+
+  const isAdmin = user.roles.some(r => r.name === 'dbadmin');
+  const isPublisher = user.roles.some(r => r.name === 'publisher');
+  const isMember = user.committees.some(c => c.id === document.committeeId);
+
+  if (!isAdmin && !(isPublisher && isMember)) {
+    return NextResponse.json(
+      { error: 'Forbidden: publisher role and committee membership required' },
+      { status: 403 }
+    );
+  }
+
+  if (document.deleted) {
+    return NextResponse.json({ error: 'Document is already deleted' }, { status: 400 });
+  }
+
+  // Move file from documents dir to .trash
+  const srcPath = path.join(DOCUMENTS_BASE, document.filename);
+  const trashDir = path.join(DOCUMENTS_BASE, document.committeeId, '.trash');
+  const basename = path.basename(document.filename);
+  const destPath = path.join(trashDir, basename);
+
+  await ensureDir(trashDir);
+
+  // Only move file if it actually exists
+  try {
+    await fs.access(srcPath);
+    await fs.rename(srcPath, destPath);
+  } catch {
+    // File may not exist (e.g., dev environment without /data); continue to update DB
+    console.warn(`Could not move document file ${srcPath} to trash: file may not exist`);
+  }
+
+  const updated = await prisma.document.update({
+    where: { id: documentId },
+    data: {
+      deleted: true,
+      deletedAt: new Date(),
+      deletedBy: session.user.id,
+      published: false,
+      archived: false,
+    },
+  });
+
+  await logAuditEvent({
+    userId: session.user.id,
+    action: 'document_deleted',
+    entityType: 'Document',
+    entityId: documentId,
+    success: true,
+    details: { committeeId: document.committeeId, title: document.title },
+    ipAddress:
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip') ||
+      'unknown',
+    userAgent: request.headers.get('user-agent') || 'unknown',
+  });
+
+  return NextResponse.json({ document: updated });
+}

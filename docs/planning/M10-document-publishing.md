@@ -1,5 +1,7 @@
 # Milestone 10: Document Publishing System
 
+**Status**: ✅ Completed (2026-02-17)
+
 **Goal**: Publishers can upload, publish, archive, delete, and restore documents for their committees.
 
 **Features**:

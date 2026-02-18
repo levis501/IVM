@@ -232,6 +232,9 @@ export default function CommitteeDetailPage() {
 
   const canManage = viewerInfo.isAdmin || viewerInfo.isPublisher || viewerInfo.isMember;
   const canSeeMembers = viewerInfo.isAdmin || viewerInfo.isMember;
+  const canManageDocs =
+    viewerInfo.isAdmin ||
+    (viewerInfo.isPublisher && viewerInfo.isMember);
 
   return (
     <div style={pageStyle}>
@@ -241,29 +244,33 @@ export default function CommitteeDetailPage() {
 
       <div style={headingRowStyle}>
         <h1 style={headingStyle}>{committee.name}</h1>
-        {viewerInfo.isAdmin && (
-          <div style={adminActionsStyle}>
+        <div style={adminActionsStyle}>
+          {viewerInfo.isAdmin && (
             <Link href={`/admin/committees/${committee.id}`} style={manageLinkStyle}>
               Edit / Manage Members
             </Link>
-          </div>
-        )}
-        {!viewerInfo.isAdmin && canManage && (
-          <div>
-            {viewerInfo.isMember && (
-              <span style={{
-                padding: '4px 10px',
-                backgroundColor: '#dcfce7',
-                color: '#166534',
-                borderRadius: '4px',
-                fontSize: '0.82rem',
-                fontWeight: 'bold',
-              }}>
-                You are a member
-              </span>
-            )}
-          </div>
-        )}
+          )}
+          {canManageDocs && (
+            <Link
+              href={`/committees/${committee.id}/documents`}
+              style={manageLinkStyle}
+            >
+              Manage Documents
+            </Link>
+          )}
+          {!viewerInfo.isAdmin && viewerInfo.isMember && !canManageDocs && (
+            <span style={{
+              padding: '4px 10px',
+              backgroundColor: '#dcfce7',
+              color: '#166534',
+              borderRadius: '4px',
+              fontSize: '0.82rem',
+              fontWeight: 'bold',
+            }}>
+              You are a member
+            </span>
+          )}
+        </div>
       </div>
 
       {committee.description && (
@@ -293,9 +300,27 @@ export default function CommitteeDetailPage() {
                     })}
                   </div>
                 </div>
-                {doc.archived && (
-                  <span style={badgeStyle}>Archived</span>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  {doc.archived && (
+                    <span style={badgeStyle}>Archived</span>
+                  )}
+                  <a
+                    href={`/api/documents/${doc.id}/download`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      padding: '6px 14px',
+                      backgroundColor: '#2d5016',
+                      color: '#fff',
+                      borderRadius: '4px',
+                      fontSize: '0.83rem',
+                      fontWeight: 'bold',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    Download
+                  </a>
+                </div>
               </div>
             ))}
           </div>
