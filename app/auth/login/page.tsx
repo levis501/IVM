@@ -22,6 +22,13 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
+        // These codes mean the user exists but is blocked — redirect to the
+        // dedicated error page rather than showing an inline message.
+        if (result.error === 'PendingVerification' || result.error === 'VerificationDenied') {
+          window.location.href = `/auth/error?error=${result.error}`;
+          return;
+        }
+
         // Map NextAuth error codes to user-friendly messages
         let errorMessage = result.error;
 

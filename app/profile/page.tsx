@@ -14,6 +14,7 @@ interface UserProfile {
   verificationStatus: string;
   isResident: boolean;
   isOwner: boolean;
+  isVerifier: boolean;
   createdAt: string;
 }
 
@@ -255,6 +256,7 @@ export default function ProfilePage() {
 
   const willRequireReverify = () => {
     if (!profile || profile.verificationStatus !== 'verified') return false;
+    if (profile.isVerifier) return false;
     return hasChanges();
   };
 

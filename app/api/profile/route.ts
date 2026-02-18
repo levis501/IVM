@@ -37,6 +37,7 @@ export async function GET(_request: NextRequest) {
       verificationStatus: user.verificationStatus,
       isResident: user.roles.some(r => r.name === 'resident'),
       isOwner: user.roles.some(r => r.name === 'owner'),
+      isVerifier: user.roles.some(r => r.name === 'verifier'),
       createdAt: user.createdAt.toISOString(),
     },
   });
@@ -117,7 +118,9 @@ export async function PUT(request: NextRequest) {
     isOwner !== currentIsOwner;
 
   const wasVerified = user.verificationStatus === 'verified';
-  const willReverify = needsReverify && wasVerified;
+  // Verifiers can edit their own profile freely without triggering re-verification
+  const isVerifier = user.roles.some(r => r.name === 'verifier');
+  const willReverify = needsReverify && wasVerified && !isVerifier;
 
   // Update user data
   const updateData: Record<string, unknown> = {
