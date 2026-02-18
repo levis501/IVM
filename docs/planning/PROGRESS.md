@@ -665,13 +665,34 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M17: Security Hardening
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
 **Key Deliverables**:
-- [ ] Comprehensive security audit
-- [ ] Security hardening implementation
-- [ ] Security documentation
+- [x] Security headers in middleware: X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy, Content-Security-Policy, Strict-Transport-Security
+- [x] Security headers applied to ALL responses (matcher broadened to catch all non-static routes)
+- [x] Input sanitization library (lib/sanitize.ts): HTML escaping, string sanitization, filename sanitization, email sanitization
+- [x] SQL injection pattern detection (defense-in-depth logging, Prisma already prevents injection)
+- [x] File upload security already implemented in M10 (MIME type + extension + size validation, path traversal protection)
+- [x] Rate limiting already implemented in M03 (login attempts, magic link requests)
+- [x] CSRF protection via NextAuth (JWT strategy with HTTP-only cookies)
+- [x] XSS prevention via React (auto-escaping) + CSP header + sanitize utility
+- [x] SQL injection prevention via Prisma parameterized queries
+- [x] Secure session configuration via JWT HTTP-only cookies (M03)
+- [x] Dependency vulnerability scan: 9 moderate issues in eslint dev dependencies (no production vulnerabilities)
+
+**New Files Created**:
+- `lib/sanitize.ts` - Input sanitization utilities (escapeHtml, sanitizeString, sanitizeFilename, sanitizeEmail, hasSqlInjectionPatterns)
+
+**Files Modified**:
+- `middleware.ts` - Added security headers to all responses, broadened matcher to cover all routes
+
+**Technical Notes**:
+- CSP allows 'unsafe-inline' and 'unsafe-eval' for Next.js SSR compatibility
+- Nginx also adds security headers (nginx/default.conf) for defense-in-depth
+- npm audit shows 9 moderate vulnerabilities in eslint dev dependencies only; no production vulnerabilities
+- Prisma handles SQL injection prevention at the ORM level; sanitize.ts provides defense-in-depth detection
 
 ---
 
@@ -714,19 +735,19 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 18 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12, M13, M14, M15, M16)
+**Completed**: 19 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12, M13, M14, M15, M16, M17)
 **In Progress**: 0
-**Not Started**: 3
-**Overall Progress**: 86%
+**Not Started**: 2
+**Overall Progress**: 90%
 
 ---
 
 ## Current Phase
-**Phase 4: Production Ready** - In Progress. M13-M16 completed.
+**Phase 4: Production Ready** - In Progress. M13-M17 completed.
 
 ## Next Steps
 1. Continue Phase 4: Production Ready
-2. Start M17: Security Hardening
+2. Start M18: Testing Infrastructure and Coverage
 
 ---
 

@@ -21,6 +21,29 @@ const ADMIN_ROUTES = [
   '/admin/console',
 ];
 
+// Security headers applied to all responses
+function addSecurityHeaders(response: NextResponse): NextResponse {
+  // Prevent clickjacking
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  // Prevent MIME type sniffing
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  // XSS protection (legacy browsers)
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  // Referrer policy
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // Permissions policy
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  // Content Security Policy
+  response.headers.set(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'self';"
+  );
+  // Strict Transport Security (only effective over HTTPS)
+  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -30,7 +53,8 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = ADMIN_ROUTES.some(route => pathname.startsWith(route));
 
   if (!isAuthRequired && !isVerifierRoute && !isAdminRoute) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    return addSecurityHeaders(response);
   }
 
   // Get the JWT token
@@ -43,15 +67,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  return addSecurityHeaders(response);
 }
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/profile/:path*',
-    '/events/:path*',
-    '/committees/:path*',
-    '/admin/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|images/).*)',
   ],
 };
