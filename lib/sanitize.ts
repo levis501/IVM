@@ -59,10 +59,14 @@ export function sanitizeEmail(email: string): string {
  */
 export function hasSqlInjectionPatterns(input: string): boolean {
   const patterns = [
-    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|EXEC|UNION)\b.*\b(FROM|INTO|TABLE|SET|WHERE)\b)/i,
-    /('.*(--))/,
-    /(;\s*(DROP|ALTER|DELETE|INSERT|UPDATE))/i,
-    /(\bOR\b\s+\d+\s*=\s*\d+)/i,
+    /(\bSELECT\b\s+\*\s+\bFROM\b)/i,             // SELECT * FROM
+    /(\bSELECT\b\s+\w+\s*,)/i,                    // SELECT col, (column list)
+    /(\bUNION\s+(ALL\s+)?SELECT\b)/i,              // UNION [ALL] SELECT
+    /('.*(--))/,                                    // String escape + comment
+    /(;\s*(DROP|ALTER|DELETE|INSERT|UPDATE))/i,     // Statement chaining
+    /(\bOR\b\s+\d+\s*=\s*\d+)/i,                  // OR 1=1
+    /(\bDROP\s+TABLE\b)/i,                         // DROP TABLE
+    /(\bINSERT\s+INTO\b)/i,                        // INSERT INTO
   ];
   return patterns.some(pattern => pattern.test(input));
 }
