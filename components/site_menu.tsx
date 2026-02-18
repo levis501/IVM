@@ -242,6 +242,24 @@ const SiteMenu = () => {
                 </>
               )}
 
+              {/* Verifier link */}
+              {session?.user?.roles?.includes('verifier') && (
+                <>
+                  <li style={{ padding: 0 }}><hr style={menuDividerStyle} /></li>
+                  <li style={{ padding: 0 }}>
+                    <Link
+                      href="/admin/verify"
+                      onClick={closeMenu}
+                      style={getMenuItemStyle('verify')}
+                      onMouseEnter={() => setHoveredItem('verify')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      Verify Users
+                    </Link>
+                  </li>
+                </>
+              )}
+
               <li style={{ padding: 0 }}><hr style={menuDividerStyle} /></li>
               {status === "loading" ? (
                 <li style={{ ...menuInfoStyle, padding: "14px 20px" }}>Loading...</li>

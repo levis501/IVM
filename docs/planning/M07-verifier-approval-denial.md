@@ -1,5 +1,7 @@
 # Milestone 7: Verifier Approval/Denial Flow
 
+**Status**: ✅ Completed (2026-02-17)
+
 **Goal**: Verifiers can approve or deny pending user registrations.
 
 **Features**:

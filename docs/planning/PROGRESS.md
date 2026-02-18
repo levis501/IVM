@@ -268,13 +268,37 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M07: Verifier Approval/Denial Flow
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
+**Goal**: Verifiers can approve or deny pending user registrations.
+
 **Key Deliverables**:
-- [ ] Approval workflow
-- [ ] Denial workflow with email
-- [ ] Status updates
+- [x] Verifier dashboard at `/admin/verify` listing pending registrations
+- [x] Approval workflow with status update to "verified"
+- [x] Denial workflow with status update to "denied"
+- [x] Approval email sent using EmailTemplate "approval"
+- [x] Denial email sent using EmailTemplate "denial" with reason and contact info
+- [x] Verification metadata recorded (verificationUpdatedAt, verificationUpdatedBy, verificationComment)
+- [x] Approved users assigned "user" role automatically
+- [x] Audit log entries for both approve and deny actions
+- [x] Non-verifiers blocked from API and dashboard (401/403)
+- [x] "Verify Users" menu item shown only to verifier role users
+
+**New Files Created**:
+- `app/admin/verify/page.tsx` - Verifier dashboard with pending user cards, comment fields, approve/deny buttons
+- `app/api/admin/verify/route.ts` - GET (list pending users) and POST (approve/deny) API endpoint
+
+**Files Modified**:
+- `components/site_menu.tsx` - Added "Verify Users" link for verifier role users
+
+**Technical Notes**:
+- Dashboard uses inline styles consistent with project patterns
+- User cards display name, email, phone, unit, resident/owner badges, and registration date
+- Comment field is optional but recommended for verification decisions
+- Already-verified/denied users cannot be re-processed (400 error)
+- Email sending is non-blocking; verification succeeds even if email fails
 
 ---
 
@@ -446,10 +470,10 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 7 (M00, M01, M02, M03, M04, M05, M06)
+**Completed**: 8 (M00, M01, M02, M03, M04, M05, M06, M07)
 **In Progress**: 0
-**Not Started**: 14
-**Overall Progress**: 33%
+**Not Started**: 13
+**Overall Progress**: 38%
 
 ---
 
@@ -458,10 +482,10 @@ This document tracks the completion status of all milestones in the Indian Villa
 
 ## Next Steps
 1. Continue Phase 2: User Management
-2. Start M07: Verifier Approval/Denial Flow
-   - Build verifier interface at `/admin/verify`
-   - Allow verifiers to approve or deny pending users
-   - Send approval/denial email to user (templates already seeded in EmailTemplate table)
+2. Start M08: Verified User Access
+   - Middleware to check verification status for protected routes
+   - Past event date filtering logic
+   - User-only pages
 
 ---
 
