@@ -9,6 +9,7 @@
     "git commit": true,
     "pkill": true,
     "/home/levis/Development/IVM/test-register.sh": true,
-    "/home/levis/Development/IVM/test-validation.sh": true
+    "/home/levis/Development/IVM/test-validation.sh": true,
+    "npx tsc": true
   }
 }

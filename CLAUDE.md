@@ -7,7 +7,7 @@ This document helps AI agents quickly understand and navigate the Indian Village
 **Indian Village Manor Community Website** - A Next.js-based HOA community website with role-based access control, document management, event calendar, and user verification workflows.
 
 **Project Type**: Private HOA community portal
-**Current Status**: Phase 1 - Foundation (4 of 21 milestones completed)
+**Current Status**: Phase 2 - User Management (7 of 21 milestones completed, 33%)
 **Current Branch**: `m00`
 **Bootstrap User Email**: `indianvillagemanor+bootstrap@gmail.com`
 
@@ -35,20 +35,44 @@ This document helps AI agents quickly understand and navigate the Indian Village
 ├── app/                    # Next.js App Router pages
 │   ├── globals.css        # TailwindCSS styles (IVM green theme)
 │   ├── layout.tsx         # Root layout with WindowContext
-│   └── page.tsx           # Home page (long scroll, 6 sections)
+│   ├── page.tsx           # Home page (long scroll, 6 sections)
+│   ├── auth/
+│   │   ├── login/page.tsx          # Magic link login form
+│   │   ├── verify-request/page.tsx # "Check your email" confirmation
+│   │   ├── error/page.tsx          # Auth error (pending/denied users)
+│   │   └── forgot-email/page.tsx   # Email recovery by unit number
+│   └── register/
+│       ├── page.tsx                # Registration form
+│       └── confirmation/page.tsx   # Registration confirmation
 ├── components/            # React components
 │   ├── Logo.tsx          # IVM logo component
 │   ├── Modal.tsx         # Zoom modal for images
 │   ├── HeaderSection.tsx # Fixed header with hamburger menu
+│   ├── site_menu.tsx     # Role-based navigation menu
+│   ├── SessionProviderWrapper.tsx  # Session + fresh-login tracker
 │   └── window/           # Grid system components
 ├── lib/                   # Utilities
 │   ├── prisma.ts         # Prisma client singleton
-│   └── email.ts          # Nodemailer setup
+│   ├── email.ts          # Nodemailer setup
+│   ├── auth.ts           # NextAuth configuration and callbacks
+│   ├── audit.ts          # Audit logging utility
+│   └── validation.ts     # Zod validation schemas (registration)
+├── app/api/
+│   ├── auth/
+│   │   ├── [...nextauth]/route.ts  # NextAuth handler
+│   │   ├── recover-email/route.ts  # Email recovery endpoint
+│   │   └── register/route.ts       # User registration endpoint
+│   └── committees/
+│       └── visible/route.ts         # Visible committees for user
+├── types/
+│   └── next-auth.d.ts    # TypeScript declarations for NextAuth
 ├── prisma/               # Database
-│   ├── schema.prisma     # Schema (8 models)
+│   ├── schema.prisma     # Schema (8 models + NextAuth tables)
 │   ├── seed.ts           # Idempotent seed script
 │   └── migrations/       # Migration history
 ├── docs/planning/        # Milestone documentation (M00-M20)
+├── scripts/              # Dev utility scripts
+│   └── kill3000_and_start_dev.sh  # Kill port 3000 and start dev server
 └── public/images/        # Image assets (18 images from reference)
 ```
 
@@ -61,7 +85,7 @@ npm install                    # Install dependencies
 npx prisma migrate dev         # Run migrations
 npx prisma db seed             # Seed database (idempotent)
 npx prisma generate            # Generate Prisma client
-npm run dev                    # Start dev server (localhost:3000)
+/home/levis/Development/IVM/scripts/kill3000_and_start_dev.sh  # Start/restart dev server (localhost:3000)
 ```
 
 ### Database Management
@@ -86,10 +110,14 @@ The project follows a **21-milestone** implementation plan (M00-M20) across 4 ph
 - **M01**: Anonymous User Experience ✅
 - **M02**: Database Schema and Seed Data ✅
 - **M03**: Magic Link Authentication ✅
-- **M04**: Menu and Navigation ⬜ *(NEXT)*
+- **M04**: Menu and Navigation ✅
 
 ### Phase 2: User Management (M05-M08.5)
-Covers registration, verification workflow, profile management
+- **M05**: User Registration Flow ✅
+- **M06**: Verifier Notification System ✅
+- **M07**: Verifier Approval/Denial Flow ⬜ *(NEXT)*
+- **M08**: Verified User Access ⬜
+- **M08.5**: User Profile Management ⬜
 
 ### Phase 3: Core Features (M09-M12)
 Committees, documents, calendar, admin console
@@ -214,7 +242,7 @@ See `.env.example` for template.
 
 ## Known Issues & Resolutions
 
-All major issues from M01, M02, and M03 have been resolved:
+All major issues from M01 through M05 have been resolved:
 - ✅ next-auth peer dependency (use --legacy-peer-deps)
 - ✅ React hydration mismatch (default rendering in WindowWithSize)
 - ✅ NextAuth SESSION_FETCH_ERROR (real API route now configured)
@@ -225,18 +253,19 @@ All major issues from M01, M02, and M03 have been resolved:
 - ✅ Prisma named exports (use `{ prisma }` import)
 - ✅ TypeScript linting errors (removed `any` types, unused parameters)
 - ✅ useSearchParams Suspense boundary (wrapped in error page)
+- ✅ Zod validation error handling (use safeParse, check `.issues` not `.errors`)
+- ✅ Role-based user creation (resident/owner roles, no boolean fields)
 
-## Next Steps (M04)
+## Next Steps (M07)
 
-The next milestone is **M04: Basic Menu and Navigation for Authenticated Users**.
+The next milestone is **M07: Verifier Approval/Denial Flow**.
 
 **Key Tasks**:
-1. Add role-based menu items for authenticated users
-2. Implement protected route middleware
-3. Create basic navigation structure for authenticated features
-4. Display user information in menu
+1. Build verifier interface at `/admin/verify` listing pending users
+2. Allow verifiers to approve or deny pending users
+3. Send approval/denial email to user (templates already seeded in EmailTemplate table)
 
-**See**: `docs/planning/M04-menu-navigation.md` for detailed requirements
+**See**: `docs/planning/M07-verifier-approval.md` for detailed requirements
 
 ## Tips for Future Agents
 
@@ -264,6 +293,6 @@ This is a private project for Indian Village Manor HOA.
 
 ---
 
-**Last Updated**: 2026-02-17 (M03 completion)
-**Document Version**: 1.1
+**Last Updated**: 2026-02-17 (M06 completion)
+**Document Version**: 1.3
 **For**: Future AI agents working on this project

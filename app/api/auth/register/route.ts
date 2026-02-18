@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { registrationSchema } from '@/lib/validation';
 import { logAuditEvent } from '@/lib/audit';
+import { sendVerifierNotification } from '@/lib/notifications';
 
 export async function POST(request: NextRequest) {
   try {
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
       action: 'user_registered',
       entityType: 'User',
       entityId: user.id,
+      success: true,
       details: {
         email: user.email,
         unitNumber: user.unitNumber,
@@ -90,6 +92,17 @@ export async function POST(request: NextRequest) {
       ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
       userAgent: request.headers.get('user-agent') || 'unknown',
     });
+
+    // Notify verifiers of the new registration (non-blocking - don't fail registration if email fails)
+    sendVerifierNotification({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone || '',
+      unitNumber: user.unitNumber,
+      roles: user.roles.map(r => r.name),
+    }).catch(err => console.error('Failed to send verifier notification:', err));
 
     return NextResponse.json(
       {

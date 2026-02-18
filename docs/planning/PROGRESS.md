@@ -237,12 +237,33 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M06: Verifier Notification System
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
 **Key Deliverables**:
-- [ ] Verifier notification emails
-- [ ] Notification details (user info)
+- [x] `lib/notifications.ts` with `sendVerifierNotification` function
+- [x] Email notification to all verified users with verifier role on new registration
+- [x] Email uses `verifier-notification` template from EmailTemplate table
+- [x] Notification includes: firstName, lastName, email, phone, unit, resident/owner status, verification link
+- [x] Verification link points to `/admin/verify` (to be implemented in M07)
+- [x] Failed email notification sent to all dbadmin users
+- [x] All notification actions logged to AuditLog
+- [x] Notification is non-blocking (registration succeeds even if email fails)
+
+**New Files Created**:
+- `lib/notifications.ts` - `sendVerifierNotification` and `notifyDbAdminOfEmailFailure` functions
+
+**Files Modified**:
+- `app/api/auth/register/route.ts` - Added `sendVerifierNotification` call after user creation; fixed pre-existing missing `success` field in `logAuditEvent` call
+
+**Technical Notes**:
+- Notification is fire-and-forget (non-blocking) so registration API response is not delayed by email sending
+- Only `verified` users with `verifier` role receive notifications (not pending/denied verifiers)
+- isResident/isOwner status derived from user's roles array (matches role-based schema)
+- dbadmin fallback alert uses inline email body (no template required for this edge case)
+
+**Issues Resolved**:
+- Pre-existing TypeScript error in `register/route.ts`: `logAuditEvent` call was missing required `success: boolean` field (fixed as part of this milestone)
 
 ---
 
@@ -425,22 +446,22 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 6 (M00, M01, M02, M03, M04, M05)
+**Completed**: 7 (M00, M01, M02, M03, M04, M05, M06)
 **In Progress**: 0
-**Not Started**: 15
-**Overall Progress**: 29%
+**Not Started**: 14
+**Overall Progress**: 33%
 
 ---
 
 ## Current Phase
-**Phase 2: User Management** - In progress. Basic registration flow complete.
+**Phase 2: User Management** - In progress. Registration and verifier notification complete.
 
 ## Next Steps
 1. Continue Phase 2: User Management
-2. Start M06: Verifier Notification System
-   - Create email notification system for verifiers
-   - Notify verifiers when new users register
-   - Include user details in notification
+2. Start M07: Verifier Approval/Denial Flow
+   - Build verifier interface at `/admin/verify`
+   - Allow verifiers to approve or deny pending users
+   - Send approval/denial email to user (templates already seeded in EmailTemplate table)
 
 ---
 
