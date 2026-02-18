@@ -54,7 +54,7 @@ This document covers manual testing procedures for all Phase 2 milestones (M05-M
 ### Test 7: Pending User Cannot Log In
 1. Navigate to `/auth/login`
 2. Enter the email from Test 5
-3. **Expected**: After clicking the magic link (or checking the auth flow), user is redirected to error page with "PendingVerification" message
+3. **Expected**: After clicking the magic link, user is redirected to the error page at `/auth/error` with a "PendingVerification" message (not a blank page or server error)
 
 ### Test 8: Login Page has Register Link
 1. Navigate to `/auth/login`
@@ -70,7 +70,10 @@ This document covers manual testing procedures for all Phase 2 milestones (M05-M
 3. **Expected**: Email with subject "New User Registration Pending Verification" containing:
    - New user's name, email, phone, unit number
    - Resident/Owner status
-   - Link to `/admin/verify`
+   - A magic link (one-time use) that logs the verifier in and navigates directly to `/admin/verify`
+4. Click the magic link from a browser where the verifier is **not** already logged in
+5. **Expected**: Verifier is logged in automatically and lands on `/admin/verify`
+6. **Note**: The link is single-use — clicking it a second time should redirect to the login page (token already consumed)
 
 ### Test 10: Check Audit Log
 1. After registration, check `data/logs/auth-YYYY-MM-DD.log` (today's date)
@@ -110,15 +113,15 @@ This document covers manual testing procedures for all Phase 2 milestones (M05-M
    - User assigned "user" role in database
    - `verificationUpdatedBy` set to bootstrap user's ID
    - `verificationComment` set to the entered comment
-4. Check email for the test user: approval email received with login link
+4. Check email for the test user: approval email received containing a magic link (one-time use) that logs the user in and redirects to `/dashboard`
 5. Check `AuditLog` table: entry for `user_approved` action
 
-### Test 14: Approved User Can Log In
-1. Open an incognito/private window
-2. Navigate to `/auth/login`
-3. Enter the approved user's email
-4. Follow the magic link
-5. **Expected**: User successfully logs in and sees Dashboard, Events, My Profile in the menu
+### Test 14: Approved User Can Log In via Approval Email Magic Link
+1. Open an incognito/private window (not logged in)
+2. Click the magic link from the approval email
+3. **Expected**: User is logged in automatically and lands on `/dashboard`
+4. **Note**: The link is single-use — a second click should redirect to the login page
+5. **Alternative path**: If the magic link has expired or already been used, navigate to `/auth/login`, enter the approved user's email, and follow the new magic link sent there
 
 ### Test 15: Deny a User
 1. Register another new user (e.g., `testuser2@example.com`)
@@ -135,7 +138,7 @@ This document covers manual testing procedures for all Phase 2 milestones (M05-M
 
 ### Test 16: Denied User Cannot Log In
 1. Try to log in with the denied user's email
-2. **Expected**: Redirected to error page with "VerificationDenied" message
+2. **Expected**: After clicking the magic link, user is redirected to the error page at `/auth/error` with a "VerificationDenied" message (not a blank page or server error)
 
 ### Test 17: Non-Verifier Cannot Access Dashboard
 1. Log in as a regular verified user (approved in Test 13)
