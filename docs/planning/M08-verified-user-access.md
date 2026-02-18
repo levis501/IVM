@@ -1,5 +1,7 @@
 # Milestone 8: Verified User Access
 
+**Status**: ✅ Completed (2026-02-17)
+
 **Goal**: Verified users can access protected areas of the site.
 
 **Features**:

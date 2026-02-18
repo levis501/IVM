@@ -265,6 +265,39 @@ const SiteMenu = () => {
                 <li style={{ ...menuInfoStyle, padding: "14px 20px" }}>Loading...</li>
               ) : session ? (
                 <>
+                  <li style={{ padding: 0 }}>
+                    <Link
+                      href="/dashboard"
+                      onClick={closeMenu}
+                      style={getMenuItemStyle('dashboard')}
+                      onMouseEnter={() => setHoveredItem('dashboard')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li style={{ padding: 0 }}>
+                    <Link
+                      href="/events"
+                      onClick={closeMenu}
+                      style={getMenuItemStyle('events')}
+                      onMouseEnter={() => setHoveredItem('events')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      Events
+                    </Link>
+                  </li>
+                  <li style={{ padding: 0 }}>
+                    <Link
+                      href="/profile"
+                      onClick={closeMenu}
+                      style={getMenuItemStyle('profile')}
+                      onMouseEnter={() => setHoveredItem('profile')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      My Profile
+                    </Link>
+                  </li>
                   <li style={{ ...menuInfoStyle, borderBottom: "none" }}>
                     Signed in as: {session.user?.firstName} {session.user?.lastName}
                   </li>

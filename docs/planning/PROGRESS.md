@@ -303,12 +303,36 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M08: Verified User Access
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
+**Goal**: Verified users can access protected areas of the site.
+
 **Key Deliverables**:
-- [ ] Verified user access controls
-- [ ] Past events access (calendar month)
+- [x] Middleware to check authentication for protected routes (/dashboard, /profile, /events, /admin)
+- [x] Unauthenticated users redirected to login with callbackUrl
+- [x] Events page with past event date filtering (calendar month boundary)
+- [x] Events API: verified users see all events; anonymous/unverified see only current month onward
+- [x] User dashboard page showing account status, roles, and navigation cards
+- [x] Pending users see warning about limited access on dashboard
+- [x] Pending/denied users blocked at login (M03, unchanged)
+- [x] Dashboard, Events, and My Profile links added to site menu for authenticated users
+
+**New Files Created**:
+- `app/dashboard/page.tsx` - User dashboard with status card and navigation
+- `app/events/page.tsx` - Events listing with past event filtering
+- `app/api/events/route.ts` - Events API with verification-aware filtering
+
+**Files Modified**:
+- `middleware.ts` - Updated with JWT-based auth checks for protected routes
+- `components/site_menu.tsx` - Added Dashboard, Events, and My Profile links
+
+**Technical Notes**:
+- Middleware uses `next-auth/jwt` `getToken()` for Edge Runtime compatibility
+- Past event boundary: events before start of current calendar month require verified login
+- No separate middleware for verifier routes; role check is in the API/page component level
+- Events page is accessible to all but content is filtered by verification status
 
 ---
 
@@ -470,10 +494,10 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 8 (M00, M01, M02, M03, M04, M05, M06, M07)
+**Completed**: 9 (M00, M01, M02, M03, M04, M05, M06, M07, M08)
 **In Progress**: 0
-**Not Started**: 13
-**Overall Progress**: 38%
+**Not Started**: 12
+**Overall Progress**: 43%
 
 ---
 
@@ -482,10 +506,10 @@ This document tracks the completion status of all milestones in the Indian Villa
 
 ## Next Steps
 1. Continue Phase 2: User Management
-2. Start M08: Verified User Access
-   - Middleware to check verification status for protected routes
-   - Past event date filtering logic
-   - User-only pages
+2. Start M08.5: User Profile Management
+   - Profile page for viewing/editing user info
+   - Re-verification flow for sensitive field changes
+   - Profile update validation
 
 ---
 
