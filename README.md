@@ -1,141 +1,174 @@
 # Indian Village Manor - Community Website
 
-A Next.js-based community website for Indian Village Manor HOA.
+A Next.js-based community portal for Indian Village Manor HOA with role-based access control, document management, event calendar, and user verification workflows.
+
+## Features
+
+- **Magic Link Authentication** - Passwordless login via email magic links
+- **SSO Support** - Optional Google and Microsoft/Azure AD single sign-on
+- **User Registration & Verification** - New users register and are verified by designated verifiers
+- **Role-Based Access Control** - 7 roles: dbadmin, publisher, calendar, verifier, user, owner, resident
+- **Committee Management** - Create committees, manage members, publish documents
+- **Document Publishing** - Upload, publish, archive, and restore documents per committee
+- **Event Calendar** - Create and manage events with month-grouped calendar view
+- **Admin Console** - User management, system configuration, email templates, audit logs
+- **Audit Logging** - Comprehensive logging of all sensitive operations
+- **Security Hardened** - CSP headers, input sanitization, rate limiting, bot detection
 
 ## Prerequisites
 
-- Node.js 18+
-- Docker (for local PostgreSQL database)
-- npm or yarn
+- Node.js 20+
+- Docker and Docker Compose
+- npm
 
-## Getting Started
+## Quick Start (Development)
 
-### 1. Install Dependencies
+### 1. Clone and Install
 
 ```bash
+git clone <repository-url>
+cd IVM
 npm install
 ```
 
-### 2. Start PostgreSQL Database
+### 2. Start PostgreSQL
 
 ```bash
 docker-compose up -d
 ```
 
-This will start a PostgreSQL database on `localhost:5432`.
-
-### 3. Set Up Environment Variables
-
-Copy `.env.example` to `.env` and update the values:
+### 3. Configure Environment
 
 ```bash
 cp .env.example .env
 ```
 
-Update the email configuration in `.env` with your SMTP credentials.
+Edit `.env` with your values:
+- `DATABASE_URL` - PostgreSQL connection string
+- `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
+- `EMAIL_SERVER` - SMTP connection string for magic link emails
+- `EMAIL_FROM` - Sender email address
 
-### 4. Run Database Migrations
+See `.env.example` for all available configuration options including SSO.
 
-```bash
-npx prisma migrate dev
-```
-
-### 5. (Optional) Seed Database
-
-```bash
-npx prisma db seed
-```
-
-Note: Seed data will be implemented in Milestone M02.
-
-### 6. Generate Prisma Client
+### 4. Initialize Database
 
 ```bash
-npx prisma generate
+npx prisma migrate dev     # Run migrations
+npx prisma db seed         # Seed bootstrap user, roles, configs, templates
+npx prisma generate        # Generate Prisma client
 ```
 
-### 7. Start Development Server
+The seed script is idempotent and safe to run multiple times.
+
+### 5. Start Development Server
 
 ```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to view the application.
+Visit [http://localhost:3000](http://localhost:3000).
+
+**Bootstrap user**: `indianvillagemanor+bootstrap@gmail.com` (dbadmin + verifier roles)
 
 ## Project Structure
 
 ```
-.
-├── app/                 # Next.js app directory
-│   ├── globals.css     # Global styles with TailwindCSS
-│   ├── layout.tsx      # Root layout
-│   └── page.tsx        # Home page
-├── components/         # React components
-├── lib/                # Utility libraries
-│   ├── prisma.ts      # Prisma client instance
-│   └── email.ts       # Email utilities (nodemailer)
-├── prisma/             # Database schema and migrations
-│   ├── schema.prisma  # Database schema
-│   └── seed.ts        # Seed script
-├── docs/               # Project documentation
-└── docker-compose.yml  # Docker configuration for PostgreSQL
+├── app/                    # Next.js App Router pages
+│   ├── admin/             # Admin pages (verify, console, committees)
+│   ├── api/               # API routes (26 endpoints)
+│   ├── auth/              # Auth pages (login, error, verify-request)
+│   ├── committees/        # Committee pages
+│   ├── dashboard/         # User dashboard
+│   ├── events/            # Calendar/events pages
+│   ├── profile/           # User profile
+│   └── register/          # Registration flow
+├── components/            # React components (header, menu, modal, grid)
+├── lib/                   # Utilities
+│   ├── auth.ts           # NextAuth configuration
+│   ├── audit.ts          # Audit logging with bot detection
+│   ├── email.ts          # Nodemailer setup
+│   ├── notifications.ts  # Verifier and admin notifications
+│   ├── prisma.ts         # Prisma client singleton
+│   ├── sanitize.ts       # Input sanitization (XSS, SQL injection detection)
+│   └── validation.ts     # Zod validation schemas
+├── prisma/                # Database schema, migrations, seed
+├── __tests__/             # Unit tests (Jest)
+├── e2e/                   # E2E tests (Playwright)
+├── scripts/               # Utility and backup scripts
+├── nginx/                 # Nginx reverse proxy config (production)
+├── docs/                  # Planning and documentation
+├── Dockerfile             # Multi-stage production build
+├── docker-compose.yml     # Development database
+└── docker-compose.prod.yml # Full production stack
 ```
 
-## Development
+## Available Scripts
 
-### Build for Production
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run unit tests (Jest) |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run test:e2e` | Run E2E tests (Playwright, requires running server) |
+| `npm run typecheck` | Run TypeScript type checking |
+
+## Database Management
 
 ```bash
-npm run build
+npx prisma studio                          # Browse data in GUI
+npx prisma migrate dev --name <name>       # Create new migration
+npx prisma db seed                         # Seed data (idempotent)
 ```
 
-### Run Production Server
+## Environment Variables
 
-```bash
-npm start
-```
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `NEXTAUTH_URL` | Yes | Application URL (http://localhost:3000) |
+| `NEXTAUTH_SECRET` | Yes | Secret key for NextAuth JWT |
+| `EMAIL_SERVER` | Yes | SMTP connection string |
+| `EMAIL_FROM` | Yes | Sender email address |
+| `SESSION_SECRET` | Yes | Session encryption secret |
+| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
+| `AZURE_AD_CLIENT_ID` | No | Azure AD OAuth client ID |
+| `AZURE_AD_CLIENT_SECRET` | No | Azure AD OAuth client secret |
+| `AZURE_AD_TENANT_ID` | No | Azure AD tenant ID (default: common) |
 
-### Lint Code
+## Production Deployment
 
-```bash
-npm run lint
-```
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for Docker-based production deployment instructions.
 
-### Database Management
+## Operations
 
-View database in Prisma Studio:
-
-```bash
-npx prisma studio
-```
-
-Create a new migration:
-
-```bash
-npx prisma migrate dev --name <migration-name>
-```
-
-## Tech Stack
-
-- **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript
-- **Styling**: TailwindCSS
-- **Database**: PostgreSQL with Prisma ORM
-- **Email**: Nodemailer
-- **Development**: Docker for local database
-
-## Milestones
-
-Development follows a milestone-based approach. See `docs/planning/PROGRESS.md` for current progress.
-
-**Current Status**: M00 - Project Setup
+See [OPERATIONS.md](./OPERATIONS.md) for backup, recovery, monitoring, and administrative procedures.
 
 ## Documentation
 
-- [Database Schema](./DATABASE.md)
-- [Database Migrations](./DATABASE_MIGRATIONS.md)
-- [Design Document](./DESIGN.md)
-- [Development Progress](./docs/planning/PROGRESS.md)
+- [Deployment Guide](./DEPLOYMENT.md) - Production deployment
+- [Operations Guide](./OPERATIONS.md) - Day-to-day operations
+- [API Reference](./API.md) - REST API endpoints
+- [Database Schema](./DATABASE.md) - Complete schema documentation
+- [Database Migrations](./DATABASE_MIGRATIONS.md) - Migration procedures
+- [Design Document](./DESIGN.md) - Architecture and design specification
+- [Development Progress](./docs/planning/PROGRESS.md) - Milestone tracking
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router, standalone output)
+- **Language**: TypeScript (strict mode)
+- **Database**: PostgreSQL 16 + Prisma ORM
+- **Styling**: TailwindCSS
+- **Authentication**: NextAuth v4 (magic link + OAuth)
+- **Email**: Nodemailer
+- **Testing**: Jest + Playwright
+- **Containerization**: Docker (multi-stage build) + Nginx reverse proxy
 
 ## License
 
