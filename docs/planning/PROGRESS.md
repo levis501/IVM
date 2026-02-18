@@ -337,13 +337,34 @@ This document tracks the completion status of all milestones in the Indian Villa
 ---
 
 ### M08.5: User Profile Management
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
+**Goal**: Verified users can update their profile information with re-verification flow.
+
 **Key Deliverables**:
-- [ ] Profile edit page
-- [ ] Re-verification on email/phone change
-- [ ] Profile update validation
+- [x] Profile page showing all user details (firstName, lastName, email, phone, unitNumber, resident/owner)
+- [x] Profile edit form with inline editing toggle
+- [x] Validation on profile update (required fields, max lengths, at least one role)
+- [x] Re-verification flow: changes to firstName, lastName, phone, unitNumber, or resident/owner revert status to "pending"
+- [x] Confirmation dialog before saving changes that trigger re-verification
+- [x] Cancel option to discard changes and maintain verified status
+- [x] Profile-update-reverify email sent to user when re-verification triggered
+- [x] Verifier notification sent when profile update requires re-verification
+- [x] Audit log for profile updates (records changes and whether re-verification triggered)
+- [x] Email field is read-only (cannot be changed through profile edit)
+- [x] Account status badge displayed on profile page
+
+**New Files Created**:
+- `app/profile/page.tsx` - Profile view/edit page with re-verification confirmation dialog
+- `app/api/profile/route.ts` - GET (fetch profile) and PUT (update profile) API endpoint
+
+**Technical Notes**:
+- Email change is intentionally disabled per admin-only policy; email field shown as read-only with explanatory note
+- The M08.5 milestone doc mentions email confirmation flow, but since email is tied to authentication (magic link), changing it would be complex and disruptive - deferred to a future milestone or admin operation
+- Role changes (resident/owner) also trigger re-verification since they affect community membership
+- Profile link was already added to site menu in M08
 
 ---
 
@@ -494,22 +515,22 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 9 (M00, M01, M02, M03, M04, M05, M06, M07, M08)
+**Completed**: 10 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5)
 **In Progress**: 0
-**Not Started**: 12
-**Overall Progress**: 43%
+**Not Started**: 11
+**Overall Progress**: 48%
 
 ---
 
 ## Current Phase
-**Phase 2: User Management** - In progress. Registration and verifier notification complete.
+**Phase 2: User Management** - ✅ Complete. All milestones (M05-M08.5) finished.
 
 ## Next Steps
-1. Continue Phase 2: User Management
-2. Start M08.5: User Profile Management
-   - Profile page for viewing/editing user info
-   - Re-verification flow for sensitive field changes
-   - Profile update validation
+1. Start Phase 3: Core Features
+2. Start M09: Committee System
+   - Committee CRUD operations
+   - Many-to-many membership
+   - Committee permissions
 
 ---
 
