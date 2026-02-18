@@ -101,6 +101,12 @@ const CONSOLE_SECTIONS: NavCard[] = [
     title: 'Email Templates',
     description: 'Edit subjects and bodies for all system email notifications.',
   },
+  {
+    href: '/admin/console/audit-logs',
+    icon: '📋',
+    title: 'Audit Logs',
+    description: 'View, search, filter, and export all audit log entries. Run log retention cleanup.',
+  },
 ];
 
 const OTHER_ADMIN_LINKS: NavCard[] = [

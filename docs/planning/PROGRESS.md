@@ -528,14 +528,39 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Phase 4: Production Ready (M13-M20)
 
 ### M13: Comprehensive Audit Logging System
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
 **Key Deliverables**:
-- [ ] Enhanced audit logging
-- [ ] Volume storage (/data/logs)
-- [ ] Robot detection
-- [ ] Log retention policy
+- [x] Enhanced audit logging with actor formatting ("firstName lastName (Unit: X)" or "anonymous")
+- [x] Consolidated JSON-lines audit.log file in /data/logs volume
+- [x] Robot/bot detection via user-agent pattern matching (30+ bot patterns)
+- [x] Bot traffic filtered from anonymous page view logs
+- [x] Log retention cleanup function with configurable retention periods
+- [x] Audit log viewer UI at /admin/console/audit-logs (dbadmin only)
+- [x] Search/filter by user, action type, date range
+- [x] Export to CSV functionality
+- [x] View log details (expandable JSON details)
+- [x] Pagination support (50 entries per page)
+- [x] Log retention cleanup via UI with confirmation dialog
+- [x] Audit Logs card added to Admin Console dashboard
+- [x] Query helper function with filtering support
+
+**New Files Created**:
+- `app/api/admin/audit-logs/route.ts` - GET (query/filter/export) and POST (cleanup) API
+- `app/admin/console/audit-logs/page.tsx` - Audit log viewer with search, filter, export, cleanup
+
+**Files Modified**:
+- `lib/audit.ts` - Enhanced with bot detection, actor formatting, JSON-lines log format, cleanup/query functions
+- `app/admin/console/page.tsx` - Added Audit Logs navigation card
+
+**Technical Notes**:
+- Log format changed from pipe-delimited to JSON-lines for better parseability
+- Bot detection uses regex patterns for 30+ known bot user-agents
+- Anonymous page views from bots are silently dropped (not logged)
+- Retention policies read from SystemConfig: audit_log_retention_days (365), anonymous_log_retention_days (90)
+- CSV export limited to 10,000 entries per export
 
 ---
 
@@ -624,19 +649,19 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Summary Statistics
 
 **Total Milestones**: 21 (M00-M20)
-**Completed**: 14 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12)
+**Completed**: 15 (M00, M01, M02, M03, M04, M05, M06, M07, M08, M08.5, M09, M10, M11, M12, M13)
 **In Progress**: 0
-**Not Started**: 7
-**Overall Progress**: 67%
+**Not Started**: 6
+**Overall Progress**: 71%
 
 ---
 
 ## Current Phase
-**Phase 3: Core Features** - ✅ Complete. All milestones (M09-M12) finished.
+**Phase 4: Production Ready** - In Progress. M13 completed.
 
 ## Next Steps
-1. Start Phase 4: Production Ready
-2. Start M13: Comprehensive Audit Logging System
+1. Continue Phase 4: Production Ready
+2. Start M14: SSO Authentication
 
 ---
 

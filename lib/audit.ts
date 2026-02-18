@@ -7,6 +7,7 @@ export interface AuditLogEntry {
   userId?: string;
   userEmail?: string;
   userName?: string;
+  unitNumber?: string;
   action: string;
   entityType?: string;
   entityId?: string;
@@ -18,6 +19,45 @@ export interface AuditLogEntry {
 
 const LOG_DIR = process.env.AUDIT_LOG_DIR || (process.env.NODE_ENV === 'production' ? '/data/logs' : './data/logs');
 
+// Common bot/robot user-agent patterns
+const BOT_PATTERNS = [
+  /bot/i, /crawl/i, /spider/i, /slurp/i, /mediapartners/i,
+  /googlebot/i, /bingbot/i, /yandex/i, /baiduspider/i,
+  /facebookexternalhit/i, /twitterbot/i, /rogerbot/i,
+  /linkedinbot/i, /embedly/i, /quora link preview/i,
+  /showyoubot/i, /outbrain/i, /pinterest/i, /applebot/i,
+  /developers\.google\.com/i, /google-structured-data-testing-tool/i,
+  /semrush/i, /ahrefsbot/i, /mj12bot/i, /dotbot/i,
+  /petalbot/i, /uptimerobot/i, /headlesschrome/i,
+  /phantomjs/i, /python-requests/i, /curl\//i, /wget\//i,
+  /scrapy/i, /httpclient/i, /java\//i, /libwww/i,
+  /go-http-client/i, /node-fetch/i, /axios/i,
+];
+
+/**
+ * Check if a user-agent string belongs to a known bot/robot
+ */
+export function isBot(userAgent?: string): boolean {
+  if (!userAgent) return false;
+  return BOT_PATTERNS.some(pattern => pattern.test(userAgent));
+}
+
+/**
+ * Format actor string: "firstName lastName (Unit: X)" or "anonymous"
+ */
+export function formatActor(entry: AuditLogEntry): string {
+  if (entry.userName && entry.unitNumber) {
+    return `${entry.userName} (Unit: ${entry.unitNumber})`;
+  }
+  if (entry.userName) {
+    return entry.userName;
+  }
+  if (entry.userEmail) {
+    return entry.userEmail;
+  }
+  return 'anonymous';
+}
+
 // Ensure log directory exists
 function ensureLogDirectory() {
   if (!fs.existsSync(LOG_DIR)) {
@@ -25,33 +65,33 @@ function ensureLogDirectory() {
   }
 }
 
-// Simple log format: timestamp | userId | userName | action | success | details
+// JSON-lines log format for audit.log
 function formatLogEntry(entry: AuditLogEntry): string {
-  const timestamp = new Date().toISOString();
-  const userId = entry.userId || 'anonymous';
-  const userName = entry.userName || entry.userEmail || 'anonymous';
-  const action = entry.action;
-  const success = entry.success ? 'SUCCESS' : 'FAILED';
-  const details = entry.details ? JSON.stringify(entry.details) : '';
-  const ip = entry.ipAddress || 'unknown';
-
-  return `${timestamp} | ${userId} | ${userName} | ${action} | ${success} | ${ip} | ${details}\n`;
+  const logObj = {
+    timestamp: new Date().toISOString(),
+    userId: entry.userId || null,
+    actor: formatActor(entry),
+    action: entry.action,
+    entityType: entry.entityType || null,
+    entityId: entry.entityId || null,
+    success: entry.success,
+    ipAddress: entry.ipAddress || null,
+    userAgent: entry.userAgent || null,
+    isBot: isBot(entry.userAgent),
+    details: entry.details || null,
+  };
+  return JSON.stringify(logObj) + '\n';
 }
 
-// Write to daily log file
+// Write to consolidated audit.log file
 async function writeToLogFile(entry: AuditLogEntry): Promise<void> {
   try {
     ensureLogDirectory();
-
-    const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const logFile = path.join(LOG_DIR, `auth-${date}.log`);
-
+    const logFile = path.join(LOG_DIR, 'audit.log');
     const logLine = formatLogEntry(entry);
-
     fs.appendFileSync(logFile, logLine);
   } catch (error) {
     console.error('Error writing to audit log file:', error);
-    // Don't throw - logging should not break application flow
   }
 }
 
@@ -64,20 +104,27 @@ async function writeToDatabase(entry: AuditLogEntry): Promise<void> {
         action: entry.action,
         entityType: entry.entityType || null,
         entityId: entry.entityId || null,
-        details: (entry.details || {}) as Prisma.JsonObject,
+        details: ({
+          ...entry.details,
+          actor: formatActor(entry),
+          isBot: isBot(entry.userAgent),
+        }) as Prisma.JsonObject,
         ipAddress: entry.ipAddress || null,
         userAgent: entry.userAgent || null,
       },
     });
   } catch (error) {
     console.error('Error writing to audit log database:', error);
-    // Don't throw - logging should not break application flow
   }
 }
 
 // Main audit logging function
 export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
-  // Write to both file and database
+  // Skip bot traffic for anonymous page views
+  if (!entry.userId && entry.action === 'PAGE_VIEW' && isBot(entry.userAgent)) {
+    return;
+  }
+
   await Promise.all([
     writeToLogFile(entry),
     writeToDatabase(entry),
@@ -98,6 +145,7 @@ export async function logLoginAttempt(
     userEmail: email,
     userName: email,
     action: 'LOGIN_ATTEMPT',
+    entityType: 'User',
     success,
     ipAddress,
     userAgent,
@@ -116,6 +164,7 @@ export async function logMagicLinkRequest(
     userEmail: email,
     userName: email,
     action: 'MAGIC_LINK_REQUEST',
+    entityType: 'User',
     success,
     ipAddress,
     userAgent,
@@ -134,6 +183,7 @@ export async function logLogout(
     userEmail,
     userName: userEmail,
     action: 'LOGOUT',
+    entityType: 'User',
     success: true,
     ipAddress,
     userAgent,
@@ -151,13 +201,91 @@ export async function logSessionCreated(
     userEmail,
     userName: userEmail,
     action: 'SESSION_CREATED',
+    entityType: 'User',
     success: true,
     ipAddress,
     userAgent,
   });
 }
 
-// Rate limiting tracking (in-memory for M03, will be improved in M13)
+/**
+ * Clean up old audit log entries based on retention policies from SystemConfig.
+ * Returns the number of deleted entries.
+ */
+export async function cleanupAuditLogs(): Promise<{ authenticatedDeleted: number; anonymousDeleted: number }> {
+  const [authRetention, anonRetention] = await Promise.all([
+    prisma.systemConfig.findUnique({ where: { key: 'audit_log_retention_days' } }),
+    prisma.systemConfig.findUnique({ where: { key: 'anonymous_log_retention_days' } }),
+  ]);
+
+  const authDays = parseInt(authRetention?.value || '365');
+  const anonDays = parseInt(anonRetention?.value || '90');
+
+  const authCutoff = new Date(Date.now() - authDays * 24 * 60 * 60 * 1000);
+  const anonCutoff = new Date(Date.now() - anonDays * 24 * 60 * 60 * 1000);
+
+  // Delete old authenticated logs
+  const authResult = await prisma.auditLog.deleteMany({
+    where: {
+      userId: { not: null },
+      createdAt: { lt: authCutoff },
+    },
+  });
+
+  // Delete old anonymous logs
+  const anonResult = await prisma.auditLog.deleteMany({
+    where: {
+      userId: null,
+      createdAt: { lt: anonCutoff },
+    },
+  });
+
+  return {
+    authenticatedDeleted: authResult.count,
+    anonymousDeleted: anonResult.count,
+  };
+}
+
+/**
+ * Query audit logs with filtering support.
+ */
+export async function queryAuditLogs(filters: {
+  userId?: string;
+  action?: string;
+  entityType?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  page?: number;
+  pageSize?: number;
+}): Promise<{ logs: Array<Record<string, unknown>>; total: number }> {
+  const where: Prisma.AuditLogWhereInput = {};
+
+  if (filters.userId) where.userId = filters.userId;
+  if (filters.action) where.action = filters.action;
+  if (filters.entityType) where.entityType = filters.entityType;
+  if (filters.dateFrom || filters.dateTo) {
+    where.createdAt = {};
+    if (filters.dateFrom) where.createdAt.gte = filters.dateFrom;
+    if (filters.dateTo) where.createdAt.lte = filters.dateTo;
+  }
+
+  const page = filters.page || 1;
+  const pageSize = filters.pageSize || 50;
+
+  const [logs, total] = await Promise.all([
+    prisma.auditLog.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.auditLog.count({ where }),
+  ]);
+
+  return { logs: logs as unknown as Array<Record<string, unknown>>, total };
+}
+
+// Rate limiting tracking (in-memory)
 interface RateLimitEntry {
   count: number;
   firstAttempt: number;
@@ -179,7 +307,7 @@ setInterval(() => {
 }, 60 * 60 * 1000);
 
 export async function checkRateLimit(
-  identifier: string, // email or IP
+  identifier: string,
   limitType: 'login' | 'magic-link',
   maxAttempts: number,
   windowMinutes: number = 60
@@ -191,7 +319,6 @@ export async function checkRateLimit(
   let entry = rateLimitStore.get(key);
 
   if (!entry || now - entry.firstAttempt > windowMs) {
-    // New window or expired
     entry = {
       count: 1,
       firstAttempt: now,
@@ -206,7 +333,6 @@ export async function checkRateLimit(
     };
   }
 
-  // Update existing entry
   entry.count += 1;
   entry.lastAttempt = now;
   rateLimitStore.set(key, entry);
