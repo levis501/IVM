@@ -94,11 +94,12 @@ const headerStyle: React.CSSProperties = {
   position: 'fixed',
   top: 0,
   left: 0,
+  right: 0,
   zIndex: 50
 };
 
 const headerImg = {
-  width: "100vw",
+  width: "100%",
   height: "36px",
 }
 
