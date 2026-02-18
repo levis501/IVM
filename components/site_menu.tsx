@@ -243,6 +243,35 @@ const SiteMenu = () => {
                 </>
               )}
 
+              {/* Admin links for dbadmin */}
+              {session?.user?.roles?.includes('dbadmin') && (
+                <>
+                  <li style={{ padding: 0 }}><hr style={menuDividerStyle} /></li>
+                  <li style={{ padding: 0 }}>
+                    <Link
+                      href="/committees"
+                      onClick={closeMenu}
+                      style={getMenuItemStyle('committees')}
+                      onMouseEnter={() => setHoveredItem('committees')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      Committees
+                    </Link>
+                  </li>
+                  <li style={{ padding: 0 }}>
+                    <Link
+                      href="/admin/console"
+                      onClick={closeMenu}
+                      style={getMenuItemStyle('admin-console')}
+                      onMouseEnter={() => setHoveredItem('admin-console')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      Admin Console
+                    </Link>
+                  </li>
+                </>
+              )}
+
               {/* Verifier link */}
               {session?.user?.roles?.includes('verifier') && (
                 <>

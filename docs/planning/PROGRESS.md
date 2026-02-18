@@ -371,13 +371,43 @@ This document tracks the completion status of all milestones in the Indian Villa
 ## Phase 3: Core Features (M9-M12)
 
 ### M09: Committee System
-**Status**: ⬜ Not Started
-**Started**: -
-**Completed**: -
+**Status**: ✅ Completed
+**Started**: 2026-02-17
+**Completed**: 2026-02-17
+
 **Key Deliverables**:
-- [ ] Committee CRUD operations
-- [ ] Many-to-many membership
-- [ ] Committee permissions
+- [x] Committee CRUD operations (create, read, update, delete via dbadmin)
+- [x] Committee list page at /committees (dbadmin sees all; others see accessible committees)
+- [x] Committee detail page at /committees/[id] with published documents
+- [x] Committee admin pages at /admin/committees/[id] (create/edit/delete/manage members)
+- [x] Many-to-many membership management (add/remove members, dbadmin only)
+- [x] Committee permissions (dbadmin CRUD; verified users read-only for accessible committees)
+- [x] API routes: /api/admin/committees, /api/admin/committees/[id], /api/admin/committees/[id]/members, /api/committees/[id]
+- [x] Updated /api/committees/visible to include member/document counts and dbadmin shortcut
+- [x] Updated /api/admin/users route for user-picker in membership management
+- [x] "Committees" and "Admin Console" links added to site menu for dbadmin users
+- [x] Middleware updated to protect /committees and /admin/committees routes
+- [x] Audit logging for all committee and membership operations
+
+**New Files Created**:
+- `app/api/admin/committees/route.ts` - List/create committees (dbadmin)
+- `app/api/admin/committees/[id]/route.ts` - Get/update/delete a committee (dbadmin)
+- `app/api/admin/committees/[id]/members/route.ts` - Add/remove committee members (dbadmin)
+- `app/api/committees/[id]/route.ts` - Public committee detail (visibility-checked)
+- `app/api/admin/users/route.ts` - List verified users for member-add dropdown (dbadmin)
+- `app/committees/page.tsx` - Committee list page
+- `app/committees/[id]/page.tsx` - Committee detail page
+- `app/admin/committees/[id]/page.tsx` - Committee create/edit/manage-members page
+
+**Files Modified**:
+- `app/api/committees/visible/route.ts` - Added dbadmin shortcut, member/doc counts, deleted filter
+- `components/site_menu.tsx` - Added Committees and Admin Console links for dbadmin
+- `middleware.ts` - Added /committees and /admin/committees route protection
+
+**Notes**:
+- Delete is blocked if the committee has any documents (must remove documents first)
+- Committee detail page shows member list only to dbadmin and committee members
+- Published documents are shown to all verified users who can see the committee
 
 ---
 

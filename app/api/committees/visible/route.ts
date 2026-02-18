@@ -8,6 +8,7 @@ import { prisma } from '@/lib/prisma';
  * Returns committees visible to the current authenticated user
  *
  * Visibility rules:
+ * - dbadmin: all committees (with counts)
  * - Committees with published documents (visible to all verified users)
  * - Committees where user is a member (visible even if no published docs)
  * - Committees where user has publisher role (visible even if no published docs)
@@ -34,45 +35,66 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Check if user has publisher role
+    const isAdmin = user.roles.some(role => role.name === 'dbadmin');
     const hasPublisherRole = user.roles.some(role => role.name === 'publisher');
 
     // Get user's committee memberships
     const userCommitteeIds = user.committees.map(c => c.id);
 
     // Build visibility query
-    const committees = await prisma.committee.findMany({
-      where: {
-        OR: [
-          // Committees with published documents (visible to all verified users)
-          {
-            documents: {
-              some: {
-                published: true,
+    const whereClause = isAdmin
+      ? {} // admins see all committees
+      : {
+          OR: [
+            // Committees with published documents (visible to all verified users)
+            {
+              documents: {
+                some: {
+                  published: true,
+                  deleted: false,
+                },
               },
             },
-          },
-          // Committees where user is a member
-          {
-            id: {
-              in: userCommitteeIds,
+            // Committees where user is a member
+            {
+              id: {
+                in: userCommitteeIds,
+              },
             },
-          },
-          // If user has publisher role, show all committees
-          ...(hasPublisherRole ? [{}] : []),
-        ],
-      },
+            // If user has publisher role, show all committees
+            ...(hasPublisherRole ? [{}] : []),
+          ],
+        };
+
+    const committees = await prisma.committee.findMany({
+      where: whereClause,
       select: {
         id: true,
         name: true,
         description: true,
+        _count: {
+          select: {
+            members: true,
+            documents: {
+              where: { deleted: false, published: true },
+            },
+          },
+        },
       },
       orderBy: {
         name: 'asc',
       },
     });
 
-    return NextResponse.json({ committees });
+    const result = committees.map(c => ({
+      id: c.id,
+      name: c.name,
+      description: c.description,
+      memberCount: c._count.members,
+      documentCount: c._count.documents,
+    }));
+
+    return NextResponse.json({ committees: result });
   } catch (error) {
     console.error('[API] Error fetching visible committees:', error);
     return NextResponse.json(
@@ -81,3 +103,4 @@ export async function GET() {
     );
   }
 }
+

@@ -1,5 +1,7 @@
 # Milestone 9: Committee System
 
+**Status**: ✅ Completed (2026-02-17)
+
 **Goal**: Set up committees and membership management.
 
 **Features**:
@@ -12,6 +14,15 @@
   - Publishers for the committee
   - Committees with at least one published document (all verified users)
 - Committee page shows published documents
+
+**Implementation Notes**:
+- `/committees` page shows all committees to dbadmin; others see only accessible ones
+- `/committees/[id]` detail page shows published documents to all authorized viewers
+- `/admin/committees/[id]` handles both create (`new`) and edit modes
+- Delete is blocked when committee has documents (must remove documents first)
+- dbadmin sees all committees via the admin list API; visibility API used for non-admin
+- Committees and Admin Console links added to site menu for dbadmin users
+- Middleware updated: `/committees` requires auth; `/admin/committees` for dbadmin
 
 **Manual Tests**:
 1. Log in as bootstrap user (dbadmin)

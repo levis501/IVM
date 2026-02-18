@@ -7,11 +7,17 @@ const AUTH_REQUIRED_ROUTES = [
   '/dashboard',
   '/profile',
   '/events',
+  '/committees',
 ];
 
 // Routes that require verifier role
 const VERIFIER_ROUTES = [
   '/admin/verify',
+];
+
+// Routes that require dbadmin role (checked at page/API level, middleware just ensures auth)
+const ADMIN_ROUTES = [
+  '/admin/committees',
 ];
 
 export async function middleware(request: NextRequest) {
@@ -20,8 +26,9 @@ export async function middleware(request: NextRequest) {
   // Check if this is a protected route
   const isAuthRequired = AUTH_REQUIRED_ROUTES.some(route => pathname.startsWith(route));
   const isVerifierRoute = VERIFIER_ROUTES.some(route => pathname.startsWith(route));
+  const isAdminRoute = ADMIN_ROUTES.some(route => pathname.startsWith(route));
 
-  if (!isAuthRequired && !isVerifierRoute) {
+  if (!isAuthRequired && !isVerifierRoute && !isAdminRoute) {
     return NextResponse.next();
   }
 
@@ -43,6 +50,7 @@ export const config = {
     '/dashboard/:path*',
     '/profile/:path*',
     '/events/:path*',
+    '/committees/:path*',
     '/admin/:path*',
   ],
 };
