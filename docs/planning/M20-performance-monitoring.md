@@ -1,92 +1,40 @@
 # Milestone 20: Performance Optimization and Monitoring
 
-**Goal**: Optimize application performance for production use and implement monitoring/alerting system.
+**Status**: Implemented with a defined baseline; partially scoped versus the original aspirational plan.
 
-**Features**:
-- **Performance Optimization**:
-  - Database query optimization:
-    - Proper indexes (see DATABASE.md)
-    - Query analysis and optimization
-    - N+1 query prevention (use Prisma includes)
-  - Caching strategy:
-    - Static page caching (Next.js ISR)
-    - API response caching (where appropriate)
-    - Database query caching
-  - Image optimization
-  - Code splitting and lazy loading
-  - CDN setup for static assets (optional)
-- **Monitoring and Alerting System**:
-  - **Metrics collection**:
-    - Failed login attempts per user
-    - Pending verifications count
-    - Document upload success/failure rates
-    - Email delivery success/failure rates
-    - Disk usage for document and log volumes
-    - Database connection pool status
-    - API response times
-    - Error rates
-  - **Email alerting to dbadmin** for:
-    - Failed email deliveries (magic-link, verifications, notifications)
-    - Failed login attempts by a user > 3 (configurable via System Config)
-    - Pending verifications count increase
-    - Disk usage above configurable threshold (default: 85%, configurable via SystemConfig)
-    - Application errors and warnings
-    - Database connection issues
-    - Backup failures
-  - **Alert configuration UI** (dbadmin):
-    - Configure alert thresholds via SystemConfig
-    - failed_login_alert_threshold (default: 3)
-    - disk_alert_threshold_percent (default: 85)
-    - pending_verification_alert_count (default: 5)
-  - Monitoring dashboard (optional, or use external tool like Grafana)
-  - Health check endpoints for uptime monitoring
+## Goal
+Provide practical production monitoring and alerting, plus lightweight performance visibility, without introducing a heavy observability stack.
 
-**Manual Tests**:
-1. **Performance Testing**:
-   - Use Lighthouse to audit performance (score >90)
-   - Test page load times (<2s for main pages)
-   - Monitor database query performance (no queries >100ms)
-   - Upload large document (within limit) - verify reasonable upload time
-   - Load page with many documents - verify performant
-   - Check memory usage over time - no leaks
-2. **Monitoring Testing**:
-   - Trigger >3 failed logins - verify dbadmin receives alert email
-   - Register 5+ new users - verify pending verification alert sent
-   - Upload documents until disk usage >85% - verify alert sent
-   - Simulate email delivery failure - verify dbadmin notified
-   - Check application error - verify error alert sent
-3. **Alert Configuration**:
-   - Log in as dbadmin
-   - Navigate to SystemConfig
-   - Change disk_alert_threshold_percent to 75
-   - Verify new threshold takes effect
-   - Change failed_login_alert_threshold to 5
-   - Trigger 5 failed logins - verify alert sent
+## Current Implementation (In Code)
 
-**Automated Tests**:
-- Performance benchmarks for critical paths:
-  - Homepage load time <2s
-  - API endpoints respond <200ms
-  - Database queries <100ms
-- Database query performance tests (use explain analyze)
-- Load testing for API endpoints (Artillery or k6)
-  - 100 concurrent users
-  - Sustained load for 5 minutes
-- Memory leak tests (monitor for 1 hour under load)
-- **Monitoring tests**:
-  - Failed login alert triggers correctly
-  - Disk usage alert triggers at threshold
-  - Email failure alert works
-  - Pending verification alert works
-  - Alert configuration updates reflected
-- Health check endpoint returns correct status
+### Implemented
+- Monitoring library implemented in `lib/monitoring.ts`.
+- Monitoring API implemented at `/api/admin/monitoring` (GET metrics, POST alert checks).
+- Monitoring dashboard implemented at `/admin/console/monitoring`.
+- Health endpoint enhanced at `/api/health` with memory, load, uptime, and DB connectivity checks.
+- Alerting to dbadmin users implemented for:
+  - failed login threshold (`failed_login_alert_threshold`)
+  - pending verification threshold (`pending_verification_alert_count`)
+- Disk usage metrics collected for `/data/documents` and `/data/logs` and displayed.
 
-**Monitoring Metrics Dashboard** (if implemented):
-- Active users (last 24h)
-- Failed login attempts (last 24h)
-- Pending verifications
-- Document uploads (last 7 days)
-- Disk usage (documents, logs, database)
-- Database connection pool utilization
-- API response times (p50, p95, p99)
-- Error rate
+### Implemented as Configuration (Not Fully Enforced by Alerts)
+- `disk_alert_threshold_percent` exists in `SystemConfig` and admin config UI.
+- Current M20 alert-check logic does not yet send disk-threshold alerts.
+
+### Not Implemented as Dedicated M20 Deliverables
+- Formal benchmark/load-testing suite (e.g., k6/Artillery performance harness and pass/fail SLO gates).
+- Automated leak/profiling workflows and p50/p95/p99 response-time reporting pipeline.
+- Comprehensive alerting for application errors, backup failures, and generalized DB pool distress.
+
+## Scope Clarification
+The original M20 document mixed must-have features with aspirational observability items. The repository currently reflects a pragmatic baseline implementation that is production-useful but not a full observability program.
+
+## Recommended Next Steps for M20 Hardening
+1. Add disk-threshold alert enforcement using `disk_alert_threshold_percent` in `lib/monitoring.ts`.
+2. Add one repeatable load/perf script and document acceptance thresholds.
+3. Add explicit alert paths for backup failure and high-severity application errors.
+
+## Verification Snapshot
+- Type-check: passing (`npm run typecheck`)
+- Unit tests: passing (`46/46`)
+- Monitoring surfaces present and wired (API + UI + admin navigation)

@@ -7,8 +7,8 @@ This document helps AI agents quickly understand and navigate the Indian Village
 **Indian Village Manor Community Website** - A Next.js-based HOA community website with role-based access control, document management, event calendar, and user verification workflows.
 
 **Project Type**: Private HOA community portal
-**Current Status**: Phase 2 - User Management (7 of 21 milestones completed, 33%)
-**Current Branch**: `m00`
+**Current Status**: All 21 milestones complete (M00-M20, 100%)
+**Current Branch**: `main`
 **Bootstrap User Email**: `indianvillagemanor+bootstrap@gmail.com`
 
 ## Quick Reference
@@ -27,7 +27,7 @@ This document helps AI agents quickly understand and navigate the Indian Village
 - **Database**: PostgreSQL (via Docker) + Prisma ORM
 - **Styling**: TailwindCSS
 - **Email**: Nodemailer
-- **Authentication**: NextAuth (magic link + SSO planned for M14)
+- **Authentication**: NextAuth (magic link + Google + Microsoft/Azure AD SSO)
 
 ### Project Structure
 ```
@@ -96,9 +96,8 @@ npx prisma db seed             # Re-run seed (safe, idempotent)
 ```
 
 ### Git Workflow
-- Main branch is not configured yet (empty)
-- Current working branch: `m00`
-- Use feature branches for milestones: `m03`, `m04`, etc.
+- Main/default branch: `main`
+- Milestone feature branches are historical at this point; current work is maintenance and iterative improvements
 - Git auto-approve is enabled in VSCode settings
 
 ## Milestone System
@@ -115,15 +114,19 @@ The project follows a **21-milestone** implementation plan (M00-M20) across 4 ph
 ### Phase 2: User Management (M05-M08.5)
 - **M05**: User Registration Flow ✅
 - **M06**: Verifier Notification System ✅
-- **M07**: Verifier Approval/Denial Flow ⬜ *(NEXT)*
-- **M08**: Verified User Access ⬜
-- **M08.5**: User Profile Management ⬜
+- **M07**: Verifier Approval/Denial Flow ✅
+- **M08**: Verified User Access ✅
+- **M08.5**: User Profile Management ✅
 
 ### Phase 3: Core Features (M09-M12)
-Committees, documents, calendar, admin console
+Committees, documents, calendar, admin console ✅
 
 ### Phase 4: Production Ready (M13-M20)
-Audit logging, SSO, containerization, security, testing, monitoring
+Audit logging, SSO, containerization, security, testing, monitoring ✅
+
+### Current Phase
+- Implementation complete across all phases
+- Current work is documentation accuracy, operational hardening, and incremental improvements
 
 **See**: `docs/planning/PROGRESS.md` for complete status and `docs/planning/00-overview.md` for all milestones.
 
@@ -164,7 +167,7 @@ Audit logging, SSO, containerization, security, testing, monitoring
 - Log all sensitive operations
 - Track: userId, action, entityType, entityId, metadata JSON
 - Include ipAddress and userAgent for security
-- Will move to volume storage (/data/logs) in M13
+- Stored in volume-backed logs at /data/logs (implemented in M13)
 
 ## Reference Project
 
@@ -176,17 +179,16 @@ The UI design is based on an existing Angular project:
 ## Common Tasks for Agents
 
 ### Reading Project Status
-1. Check `docs/planning/PROGRESS.md` for current milestone
-2. Read the specific milestone doc in `docs/planning/M##-*.md`
-3. Review DATABASE.md if database changes needed
+1. Check `docs/planning/PROGRESS.md` for overall project completion and milestone notes
+2. Read the specific milestone doc in `docs/planning/M##-*.md` for detailed scope and caveats
+3. Review DATABASE.md if database changes are needed
 
-### Starting a New Milestone
-1. Read milestone doc: `docs/planning/M##-*.md`
-2. Update PROGRESS.md status to "In Progress"
-3. Create feature branch if needed
-4. Implement features per milestone requirements
-5. Run manual tests listed in milestone doc
-6. Update PROGRESS.md with completion status
+### Starting Follow-up Work
+1. Identify the target area (feature refinement, bug fix, docs, or operations)
+2. Confirm current behavior in code and related milestone docs
+3. Create a focused branch if needed
+4. Implement and test changes
+5. Update PROGRESS.md and the relevant milestone doc when behavior or status changes
 
 ### Database Changes
 1. Modify `prisma/schema.prisma`
@@ -220,7 +222,7 @@ The UI design is based on an existing Angular project:
 
 ### Testing
 - Manual test procedures in each milestone doc
-- Automated tests coming in M18
+- Jest unit tests and Playwright E2E infrastructure are in place (M18)
 - E2E tests for critical workflows
 - See `docs/planning/90-testing-strategy.md`
 
@@ -256,16 +258,16 @@ All major issues from M01 through M05 have been resolved:
 - ✅ Zod validation error handling (use safeParse, check `.issues` not `.errors`)
 - ✅ Role-based user creation (resident/owner roles, no boolean fields)
 
-## Next Steps (M07)
+## Current Focus Areas
 
-The next milestone is **M07: Verifier Approval/Denial Flow**.
+The milestone roadmap is complete. Current work should focus on maintenance and refinement.
 
-**Key Tasks**:
-1. Build verifier interface at `/admin/verify` listing pending users
-2. Allow verifiers to approve or deny pending users
-3. Send approval/denial email to user (templates already seeded in EmailTemplate table)
+**Recommended priorities**:
+1. Keep status documents aligned with real implementation (especially milestone caveats)
+2. Expand or tighten M20 performance/monitoring scope where desired
+3. Continue hardening operational runbooks and incident procedures
 
-**See**: `docs/planning/M07-verifier-approval.md` for detailed requirements
+**See**: `docs/planning/PROGRESS.md` and milestone docs for implementation details
 
 ## Tips for Future Agents
 
@@ -293,6 +295,6 @@ This is a private project for Indian Village Manor HOA.
 
 ---
 
-**Last Updated**: 2026-02-17 (M06 completion)
-**Document Version**: 1.3
+**Last Updated**: 2026-03-16 (post-M20 status refresh)
+**Document Version**: 1.4
 **For**: Future AI agents working on this project
